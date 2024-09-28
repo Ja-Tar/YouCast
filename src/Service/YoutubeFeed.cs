@@ -151,6 +151,17 @@ namespace Service
 
                 var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
                 var muxedStreamInfos = streamManifest.GetMuxedStreams().ToList();
+
+                if (muxedStreamInfos.Count == 0)
+                {
+                    Console.WriteLine("No muxed streams found.");
+                    var audios = streamManifest.GetAudioOnlyStreams().ToList();
+                    return audios.Count > 0
+                        ? audios.MaxBy(audio => audio.Bitrate).FirstOrDefault().Url
+                        : null;
+                    // Add in future, function to combine audio and video streams, download and return the link to local cashed file
+                }
+
                 var muxedStreamInfo =
                     muxedStreamInfos.FirstOrDefault(_ => _.VideoResolution.Height == resolution) ??
                     muxedStreamInfos.MaxBy(_ => _.VideoQuality).FirstOrDefault();
