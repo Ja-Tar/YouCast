@@ -69,7 +69,7 @@ namespace Service
                     ImageUrl = new Uri(channel.Snippet.Thumbnails.Medium.Url),
                     Items = await GenerateItemsAsync(
                         baseAddress,
-                        channel.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
+                        channel.Snippet.PublishedAt.GetValueOrDefault(),
                         arguments)
                 };
             }
@@ -128,7 +128,7 @@ namespace Service
                     ImageUrl = new Uri(playlist.Snippet.Thumbnails.Medium.Url),
                     Items = await GenerateItemsAsync(
                         baseAddress,
-                        playlist.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
+                        playlist.Snippet.PublishedAt.GetValueOrDefault(),
                         arguments)
                 };
             }
@@ -155,16 +155,13 @@ namespace Service
                 if (muxedStreamInfos.Count == 0)
                 {
                     Console.WriteLine("No muxed streams found.");
-                    var audios = streamManifest.GetAudioOnlyStreams().ToList();
-                    return audios.Count > 0
-                        ? audios.MaxBy(audio => audio.Bitrate).FirstOrDefault().Url
-                        : null;
+                    
                     // Add in future, function to combine audio and video streams, download and return the link to local cashed file
                 }
 
                 var muxedStreamInfo =
                     muxedStreamInfos.FirstOrDefault(_ => _.VideoResolution.Height == resolution) ??
-                    muxedStreamInfos.Maxima(_ => _.VideoQuality).FirstOrDefault();
+                    muxedStreamInfos.MaxBy(_ => _.VideoQuality).FirstOrDefault();
 
                 return muxedStreamInfo?.Url;
             }
@@ -179,7 +176,7 @@ namespace Service
                 var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
                 var audios = streamManifest.GetAudioOnlyStreams().ToList();
                 return audios.Count > 0
-                    ? audios.Maxima(audio => audio.Bitrate).FirstOrDefault().Url
+                    ? audios.MaxBy(audio => audio.Bitrate).FirstOrDefault().Url
                     : null;
             }
         }
@@ -255,7 +252,7 @@ namespace Service
                 new Uri(string.Format(_videoUrlFormat, playlistItem.Snippet.ResourceId.VideoId)))
             {
                 Id = playlistItem.Snippet.ResourceId.VideoId,
-                PublishDate = playlistItem.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
+                PublishDate = playlistItem.Snippet.PublishedAt.GetValueOrDefault(),
                 Summary = new TextSyndicationContent(playlistItem.Snippet.Description),
             };
 
