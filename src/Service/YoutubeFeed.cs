@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
@@ -11,6 +13,8 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3.Data;
 using MoreLinq;
 using YoutubeExplode;
+using YoutubeExplode.Converter;
+using YoutubeExplode.Videos.Streams;
 using Video = Google.Apis.YouTube.v3.Data.Video;
 using YouTubeService = Google.Apis.YouTube.v3.YouTubeService;
 
@@ -69,7 +73,7 @@ namespace Service
                     ImageUrl = new Uri(channel.Snippet.Thumbnails.Medium.Url),
                     Items = await GenerateItemsAsync(
                         baseAddress,
-                        channel.Snippet.PublishedAt.GetValueOrDefault(),
+                        channel.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
                         arguments)
                 };
             }
@@ -128,7 +132,7 @@ namespace Service
                     ImageUrl = new Uri(playlist.Snippet.Thumbnails.Medium.Url),
                     Items = await GenerateItemsAsync(
                         baseAddress,
-                        playlist.Snippet.PublishedAt.GetValueOrDefault(),
+                        playlist.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
                         arguments)
                 };
             }
@@ -140,6 +144,25 @@ namespace Service
 
             async Task<string> GetVideoUriAsync()
             {
+                var videoInfo = await _youtubeClient.Videos.GetAsync(videoId);
+                var fileName = $"{videoInfo.Title}.mp4";
+                var directoryName = "Videos";
+                var filePath = Path.Combine(directoryName, fileName);
+
+                if (!Directory.Exists(directoryName))
+                {
+                    Directory.CreateDirectory(directoryName);
+                }
+
+                if (File.Exists(filePath))
+                {
+                    Console.WriteLine($"File already exists: {fileName}");
+                    
+                    // Return stream URL to downloaded file
+
+                    return null; // FIX ME!!!!!
+                }
+
                 var resolution = 720;
                 try
                 {
@@ -155,13 +178,39 @@ namespace Service
                 if (muxedStreamInfos.Count == 0)
                 {
                     Console.WriteLine("No muxed streams found.");
-                    
-                    // Add in future, function to combine audio and video streams, download and return the link to local cashed file
+
+                    // Select best audio stream (highest bitrate)
+                    var audioStreamInfo = streamManifest
+                        .GetAudioStreams()
+                        .Where(s => s.Container == Container.Mp4)
+                        .GetWithHighestBitrate();
+
+                    // Select best video stream (1080p60 in this example)
+                    var videoStreamInfos = streamManifest
+                        .GetVideoStreams()
+                        .Where(s => s.Container == Container.Mp4)
+                        .ToList();
+
+                    var videoStreamInfo = videoStreamInfos.FirstOrDefault(_ => _.VideoResolution.Height == resolution) ??
+                                         videoStreamInfos.Maxima(_ => _.VideoQuality).FirstOrDefault();
+
+                    Console.WriteLine("Audio stream: " + audioStreamInfo);
+                    Console.WriteLine("Video stream: " + videoStreamInfo);
+
+                    // Download and mux streams into a single file
+                    var streamInfos = new IStreamInfo[] { audioStreamInfo, videoStreamInfo };
+                    await _youtubeClient.Videos.DownloadAsync(streamInfos, new ConversionRequestBuilder(filePath).Build());
+
+                    var videoPath = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+
+                    Console.WriteLine(videoPath);
+
+                    return null; // FIX ME!!!!!
                 }
 
                 var muxedStreamInfo =
                     muxedStreamInfos.FirstOrDefault(_ => _.VideoResolution.Height == resolution) ??
-                    muxedStreamInfos.MaxBy(_ => _.VideoQuality).FirstOrDefault();
+                    muxedStreamInfos.Maxima(_ => _.VideoQuality).FirstOrDefault();
 
                 return muxedStreamInfo?.Url;
             }
@@ -176,7 +225,7 @@ namespace Service
                 var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
                 var audios = streamManifest.GetAudioOnlyStreams().ToList();
                 return audios.Count > 0
-                    ? audios.MaxBy(audio => audio.Bitrate).FirstOrDefault().Url
+                    ? audios.Maxima(audio => audio.Bitrate).FirstOrDefault().Url
                     : null;
             }
         }
@@ -252,7 +301,7 @@ namespace Service
                 new Uri(string.Format(_videoUrlFormat, playlistItem.Snippet.ResourceId.VideoId)))
             {
                 Id = playlistItem.Snippet.ResourceId.VideoId,
-                PublishDate = playlistItem.Snippet.PublishedAt.GetValueOrDefault(),
+                PublishDate = playlistItem.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
                 Summary = new TextSyndicationContent(playlistItem.Snippet.Description),
             };
 
