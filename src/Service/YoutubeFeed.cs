@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.ServiceModel;
 using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
@@ -148,6 +149,7 @@ namespace Service
                 var fileName = $"{videoInfo.Title}.mp4";
                 var directoryName = "Videos";
                 var filePath = Path.Combine(directoryName, fileName);
+                var responce = "VID://";
 
                 if (!Directory.Exists(directoryName))
                 {
@@ -156,11 +158,9 @@ namespace Service
 
                 if (File.Exists(filePath))
                 {
-                    Console.WriteLine($"File already exists: {fileName}");
-                    
-                    // Return stream URL to downloaded file
+                    Console.WriteLine(filePath);
 
-                    return null; // FIX ME!!!!!
+                    return responce + filePath;
                 }
 
                 var resolution = 720;
@@ -201,11 +201,9 @@ namespace Service
                     var streamInfos = new IStreamInfo[] { audioStreamInfo, videoStreamInfo };
                     await _youtubeClient.Videos.DownloadAsync(streamInfos, new ConversionRequestBuilder(filePath).Build());
 
-                    var videoPath = Path.Combine(Directory.GetCurrentDirectory(), filePath);
+                    Console.WriteLine($"Video saved to: {filePath}");
 
-                    Console.WriteLine(videoPath);
-
-                    return null; // FIX ME!!!!!
+                    return responce + filePath;
                 }
 
                 var muxedStreamInfo =
@@ -253,6 +251,19 @@ namespace Service
             catch
             {
                 redirectUri = null;
+            }
+
+            if (redirectUri == null)
+            {
+                context.OutgoingResponse.StatusCode = HttpStatusCode.InternalServerError;
+                return;
+            }
+            else if (redirectUri.StartsWith("VID://"))
+            {
+                var filePath = redirectUri.Substring(6);
+                context.OutgoingResponse.ContentType = "video/mp4";
+                
+                context.OutgoingResponse.RedirectTo(filePath);
             }
 
             context.OutgoingResponse.RedirectTo(redirectUri);
