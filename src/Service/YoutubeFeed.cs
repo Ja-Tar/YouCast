@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
 using System.ServiceModel;
 using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
@@ -160,7 +158,7 @@ namespace Service
                 {
                     Console.WriteLine(filePath);
 
-                    return responce + filePath;
+                    return null;
                 }
 
                 var resolution = 720;
@@ -203,7 +201,7 @@ namespace Service
 
                     Console.WriteLine($"Video saved to: {filePath}");
 
-                    return responce + filePath;
+                    return null;
                 }
 
                 var muxedStreamInfo =
@@ -257,13 +255,6 @@ namespace Service
             {
                 context.OutgoingResponse.StatusCode = HttpStatusCode.InternalServerError;
                 return;
-            }
-            else if (redirectUri.StartsWith("VID://"))
-            {
-                var filePath = redirectUri.Substring(6);
-                context.OutgoingResponse.ContentType = "video/mp4";
-                
-                context.OutgoingResponse.RedirectTo(filePath);
             }
 
             context.OutgoingResponse.RedirectTo(redirectUri);
