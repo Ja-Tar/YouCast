@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
@@ -144,21 +145,21 @@ namespace Service
             async Task<string> GetVideoUriAsync()
             {
                 var videoInfo = await _youtubeClient.Videos.GetAsync(videoId);
-                var fileName = $"{videoInfo.Title}.mp4";
-                var directoryName = "Videos";
-                var filePath = Path.Combine(directoryName, fileName);
-                var responce = "VID://";
+                var fileName = $"{videoInfo.Id}.mp4";
+                var videoDirectory = "Videos";
+                var channelDirectory = Path.Combine(videoDirectory, videoInfo.Author.ChannelId);
+                var filePath = Path.Combine(channelDirectory, fileName);
 
-                if (!Directory.Exists(directoryName))
+                if (!Directory.Exists(channelDirectory))
                 {
-                    Directory.CreateDirectory(directoryName);
+                    Directory.CreateDirectory(channelDirectory);
                 }
 
                 if (File.Exists(filePath))
                 {
                     Console.WriteLine(filePath);
 
-                    return null;
+                    return GenerateFileUri(videoId, videoInfo.Author.ChannelId);
                 }
 
                 var resolution = 720;
@@ -201,7 +202,7 @@ namespace Service
 
                     Console.WriteLine($"Video saved to: {filePath}");
 
-                    return null;
+                    return GenerateFileUri(videoId, videoInfo.Author.ChannelId);
                 }
 
                 var muxedStreamInfo =
@@ -210,6 +211,8 @@ namespace Service
 
                 return muxedStreamInfo?.Url;
             }
+
+            string GenerateFileUri(string _videoId, string _channelId) => $"File.mp4?videoId={_videoId}&channelId={_channelId}";
         }
 
         public async Task GetAudioAsync(string videoId)
@@ -253,11 +256,37 @@ namespace Service
 
             if (redirectUri == null)
             {
-                context.OutgoingResponse.StatusCode = HttpStatusCode.InternalServerError;
+                context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
                 return;
             }
 
             context.OutgoingResponse.RedirectTo(redirectUri);
+        }
+
+        public Task<Stream> GetFile(string videoID, string channelID)
+        {
+            var context = WebOperationContext.Current;
+            var mainDirectory = "Videos";
+            var channelDirectory = Path.Combine(mainDirectory, channelID);
+
+            if (!Directory.Exists(channelDirectory))
+            {
+                context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                return null;
+            }
+
+            var fileName = $"{videoID}.mp4";
+            var filePath = Path.Combine(channelDirectory, fileName);
+
+            if (!File.Exists(filePath))
+            {
+                context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                return null;
+            }
+
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+            return Task.FromResult<Stream>(stream);
         }
 
         private async Task<IEnumerable<SyndicationItem>> GenerateItemsAsync(

@@ -1,3 +1,4 @@
+using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
@@ -37,5 +38,9 @@ namespace Service
         [OperationContract]
         [WebGet(UriTemplate = "Audio.m4a?videoId={videoId}")]
         Task GetAudioAsync(string videoId);
+
+        [OperationContract]
+        [WebGet(UriTemplate = "File.mp4?videoId={videoId}&channelId={channelId}")]
+        Task<Stream> GetFile(string videoId, string channelId);
     }
 }
