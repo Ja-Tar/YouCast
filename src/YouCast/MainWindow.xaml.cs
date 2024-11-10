@@ -2,6 +2,7 @@ using Service;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -409,5 +410,47 @@ namespace YouCast
 
         private void GplLink_OnClick(object sender, RoutedEventArgs e) =>
             Process.Start("https://github.com/i3arnon/YouCast/blob/master/LICENSE");
+
+        private void ClearVideoCache_OnClick(object sender, RoutedEventArgs e)
+        {
+            var videoDirectory = "Videos";
+
+            if (Directory.Exists(videoDirectory))
+            {
+                if (MessageBox.Show(
+                        "Are you sure you want to clear the video cache?",
+                        "Confirmation",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question) != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+
+                try
+                {
+                    var directoryInfo = new DirectoryInfo(videoDirectory);
+
+                    foreach (var file in directoryInfo.GetFiles())
+                    {
+                        file.Delete();
+                    }
+
+                    foreach (var dir in directoryInfo.GetDirectories())
+                    {
+                        dir.Delete(true);
+                    }
+
+                    MessageBox.Show("Video cache cleared successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An error occurred while clearing the video cache: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("The video cache directory does not exist.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
     }
 }

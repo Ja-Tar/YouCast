@@ -116,7 +116,7 @@
                                 Height="17"
                                 Content="Use a cloud service instead of your local machine (experimental)"
                                 Checked="UseCloud_IsCheckedChanged"
-                                Unchecked="UseCloud_IsCheckedChanged"/>
+                                Unchecked="UseCloud_IsCheckedChanged" IsEnabled="False"/>
                         </DockPanel>
                         <Separator Height="10"/>
                         <DockPanel>
@@ -148,12 +148,15 @@
                         <DockPanel>
                             <CheckBox x:Name="StartMinimized" DockPanel.Dock="Right" Content="Start Minimized"/>
                         </DockPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button 
+                        <DockPanel>
+                            <Button Content="Clear video cache" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1,5,0,0" Click="ClearVideoCache_OnClick"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button 
                                 x:Name="Save" 
                                 Margin="5,5,5,5"
                                 Height="26" Click="Save_OnClick" Content="Save"/>
-                        </StackPanel>
+                            </StackPanel>
+                        </DockPanel>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
