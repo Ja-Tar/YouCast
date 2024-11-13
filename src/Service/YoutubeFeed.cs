@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
@@ -284,7 +283,8 @@ namespace Service
                 return null;
             }
 
-            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            context.OutgoingResponse.ContentType = "video/mp4";
 
             return Task.FromResult<Stream>(stream);
         }
