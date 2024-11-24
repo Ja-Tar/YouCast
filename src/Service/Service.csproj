@@ -49,14 +49,14 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3582" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3608" />
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
     <PackageReference Include="morelinq" Version="4.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="YoutubeExplode" Version="6.4.3" />
+    <PackageReference Include="YoutubeExplode" Version="6.4.4" />
     <PackageReference Include="YoutubeExplode.Converter">
-      <Version>6.4.3</Version>
+      <Version>6.4.4</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

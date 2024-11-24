@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +8,7 @@ using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3.Data;
 using MoreLinq;
@@ -66,13 +67,14 @@ namespace Service
 
                 return new ItunesFeed(
                     GetTitle(channel.Snippet.Title, arguments),
-                    channel.Snippet.Description,
+                    RemoveEmojis(channel.Snippet.Description),
                     new Uri(string.Format(_channelUrlFormat, channel.Id)))
                 {
                     ImageUrl = new Uri(channel.Snippet.Thumbnails.Medium.Url),
                     Items = await GenerateItemsAsync(
-                        baseAddress,
-                        channel.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
+                    baseAddress,
+                        channel.Snippet.PublishedAt.GetValueOrDefault().ToUniversalTime(), 
+                        // PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
                         arguments)
                 };
             }
@@ -125,13 +127,14 @@ namespace Service
 
                 return new ItunesFeed(
                     GetTitle(playlist.Snippet.Title, arguments),
-                    playlist.Snippet.Description,
+                    RemoveEmojis(playlist.Snippet.Description),
                     new Uri(string.Format(_playlistUrlFormat, playlist.Id)))
                 {
                     ImageUrl = new Uri(playlist.Snippet.Thumbnails.Medium.Url),
                     Items = await GenerateItemsAsync(
                         baseAddress,
-                        playlist.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
+                        playlist.Snippet.PublishedAt.GetValueOrDefault().ToUniversalTime(),
+                        // PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
                         arguments)
                 };
             }
@@ -234,6 +237,7 @@ namespace Service
             var baseAddress = $"http://{transportAddress.DnsSafeHost}:{transportAddress.Port}/FeedService";
 
             WebOperationContext.Current.OutgoingResponse.ContentType = "application/rss+xml; charset=utf-8";
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Content-Disposition", "attachment; filename=feed.rss");
 
             var feed = await getFeedAsync(baseAddress);
             return feed.GetRss20Formatter();
@@ -332,8 +336,9 @@ namespace Service
                 new Uri(string.Format(_videoUrlFormat, playlistItem.Snippet.ResourceId.VideoId)))
             {
                 Id = playlistItem.Snippet.ResourceId.VideoId,
-                PublishDate = playlistItem.Snippet.PublishedAtDateTimeOffset.GetValueOrDefault().UtcDateTime,
-                Summary = new TextSyndicationContent(playlistItem.Snippet.Description),
+                PublishDate = playlistItem.Snippet.PublishedAt.GetValueOrDefault().ToUniversalTime(),
+                // PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
+                Summary = new TextSyndicationContent(RemoveEmojis(playlistItem.Snippet.Description)),
             };
 
             if (arguments.Encoding == "Audio")
@@ -394,7 +399,10 @@ namespace Service
         }
 
         private static string GetTitle(string title, Arguments arguments) =>
-            arguments.IsPopular ? $"{title} (By Popularity)" : title;
+            arguments.IsPopular ? $"{RemoveEmojis(title)} (By Popularity)" : RemoveEmojis(title);
+
+        private static string RemoveEmojis(string text) =>
+            Regex.Replace(text, @"\p{Cs}", string.Empty);
 
         private static string GetBaseAddress()
         {
