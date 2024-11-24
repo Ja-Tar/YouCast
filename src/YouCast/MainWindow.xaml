@@ -103,6 +103,41 @@
                 </GroupBox>
             </StackPanel>
         </TabItem>
+        <TabItem Header="Cache">
+            <StackPanel>
+                <GroupBox>
+                    <GroupBox.Header>
+                        <Label Content="Cache"/>
+                    </GroupBox.Header>
+                    <StackPanel>
+                        <DockPanel>
+                            <ListBox x:Name="CacheList" Height="170" SelectionMode="Multiple" d:ItemsSource="{d:SampleData ItemCount=4}" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}" Width="200"/>
+                                            <TextBlock Text="{Binding Size}" Width="200"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                        <DockPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button 
+                                    x:Name="OpenCacheFolder"
+                                    Margin="5,5,5,5"
+                                    Height="20" Click="OpenCacheFolder_OnClick" Content="Open Cache Folder"/>
+                                <Button 
+                                    x:Name="ClearCache" 
+                                    Margin="5,5,5,5"
+                                    Height="20" Click="ClearVideoCache_OnClick" Content="Clear Selected"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </TabItem>
         <TabItem Header="Settings">
             <StackPanel>
                 <GroupBox>
@@ -149,7 +184,6 @@
                             <CheckBox x:Name="StartMinimized" DockPanel.Dock="Right" Content="Start Minimized"/>
                         </DockPanel>
                         <DockPanel>
-                            <Button Content="Clear video cache" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1,5,0,0" Click="ClearVideoCache_OnClick"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button 
                                 x:Name="Save" 

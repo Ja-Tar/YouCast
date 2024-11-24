@@ -29,6 +29,7 @@ namespace YouCast
         private bool _gotFocus;
         private bool _maxLengthFocus;
         private WebServiceHost _serviceHost;
+        private FileSystemWatcher _fileSystemWatcher;
 
         public MainWindow()
         {
@@ -56,6 +57,30 @@ namespace YouCast
             PopulateQualities();
             LoadApiSettings();
             LoadNetworkSettings();
+            InitializeFileSystemWatcher();
+            UpdateFolderSize();
+        }
+
+        private void InitializeFileSystemWatcher()
+        {
+            _fileSystemWatcher = new FileSystemWatcher
+            {
+                Path = "Videos",
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.Size,
+                Filter = "*.*",
+                IncludeSubdirectories = true,
+                EnableRaisingEvents = true
+            };
+
+            _fileSystemWatcher.Changed += OnFolderChanged;
+            _fileSystemWatcher.Created += OnFolderChanged;
+            _fileSystemWatcher.Deleted += OnFolderChanged;
+            _fileSystemWatcher.Renamed += OnFolderChanged;
+        }
+
+        private void OnFolderChanged(object sender, FileSystemEventArgs e)
+        {
+            Dispatcher.Invoke(UpdateFolderSize);
         }
 
         private void PopulateQualities()
@@ -413,39 +438,90 @@ namespace YouCast
 
         private void ClearVideoCache_OnClick(object sender, RoutedEventArgs e)
         {
+            var selectedItems = CacheList.SelectedItems.Cast<object>().ToList();
             var videoDirectory = "Videos";
 
+            if (selectedItems.Count == 0)
+            {
+                return;
+            }
+
+            if (MessageBox.Show(
+                    "Are you sure you want to clear the selected video cache?",
+                    "Confirmation",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            foreach (var item in selectedItems)
+            {
+                var directoryPath = Path.Combine(videoDirectory, item.GetType().GetProperty("Name").GetValue(item, null).ToString());
+                if (Directory.Exists(directoryPath))
+                {
+                    try
+                    {
+                        Directory.Delete(directoryPath, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred while deleting the directory {item.GetType().GetProperty("Name").GetValue(item, null)}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+
+            UpdateFolderSize();
+        }
+
+        private void UpdateFolderSize()
+        {
+            var videoDirectory = "Videos";
             if (Directory.Exists(videoDirectory))
             {
-                if (MessageBox.Show(
-                        "Are you sure you want to clear the video cache?",
-                        "Confirmation",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question) != MessageBoxResult.Yes)
-                {
-                    return;
-                }
-
-                try
-                {
-                    var directoryInfo = new DirectoryInfo(videoDirectory);
-
-                    foreach (var file in directoryInfo.GetFiles())
+                var directoryInfo = new DirectoryInfo(videoDirectory);
+                var folderSizes = directoryInfo.GetDirectories()
+                    .Select(dir => new
                     {
-                        file.Delete();
-                    }
+                        dir.Name,
+                        Size = FormatSize(GetDirectorySize(dir))
+                    })
+                    .ToList();
 
-                    foreach (var dir in directoryInfo.GetDirectories())
-                    {
-                        dir.Delete(true);
-                    }
+                CacheList.ItemsSource = folderSizes;
+            }
+            else
+            {
+                CacheList.ItemsSource = null;
+            }
+        }
 
-                    MessageBox.Show("Video cache cleared successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"An error occurred while clearing the video cache: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+        private long GetDirectorySize(DirectoryInfo directoryInfo)
+        {
+            return directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length);
+        }
+
+        private string FormatSize(long sizeInBytes)
+        {
+            const long OneMB = 1024 * 1024;
+            const long OneGB = 1024 * OneMB;
+
+            if (sizeInBytes >= OneGB)
+            {
+                return $"{sizeInBytes / (double)OneGB:F2} GB";
+            }
+            else
+            {
+                return $"{sizeInBytes / (double)OneMB:F2} MB";
+            }
+        }
+
+        private void OpenCacheFolder_OnClick(object sender, RoutedEventArgs e)
+        {
+            var videoDirectory = "Videos";
+            if (Directory.Exists(videoDirectory))
+            {
+                Process.Start(videoDirectory);
             }
             else
             {
