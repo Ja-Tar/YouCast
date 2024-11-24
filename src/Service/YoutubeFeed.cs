@@ -403,12 +403,6 @@ namespace Service
 
         private static string RemoveEmojis(string text) =>
             Regex.Replace(text, @"\p{Cs}", string.Empty);
-
-        private static string GetBaseAddress()
-        {
-            var transportAddress = OperationContext.Current.IncomingMessageProperties.Via;
-            return $"http://{transportAddress.DnsSafeHost}:{transportAddress.Port}/FeedService";
-        }
     }
 
     public static class OutgoingWebResponseContextExtension
