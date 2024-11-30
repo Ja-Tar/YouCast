@@ -73,7 +73,7 @@ namespace Service
                     ImageUrl = new Uri(channel.Snippet.Thumbnails.Medium.Url),
                     Items = await GenerateItemsAsync(
                     baseAddress,
-                        channel.Snippet.PublishedAt.GetValueOrDefault().ToUniversalTime(), 
+                        channel.Snippet.PublishedAt.GetValueOrDefault().ToUniversalTime(),
                         // PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
                         arguments)
                 };
