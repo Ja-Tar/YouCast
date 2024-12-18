@@ -1,5 +1,6 @@
 using Service;
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -11,6 +12,8 @@ using System.ServiceModel.Web;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml;
+using System.Xml.Linq;
 using YouCast.Properties;
 using MenuItem = System.Windows.Forms.MenuItem;
 
@@ -457,7 +460,7 @@ namespace YouCast
 
             foreach (var item in selectedItems)
             {
-                var directoryPath = Path.Combine(videoDirectory, item.GetType().GetProperty("Name").GetValue(item, null).ToString());
+                var directoryPath = Path.Combine(videoDirectory, item.GetType().GetProperty("NameID").GetValue(item, null).ToString());
                 if (Directory.Exists(directoryPath))
                 {
                     try
@@ -466,7 +469,7 @@ namespace YouCast
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"An error occurred while deleting the directory {item.GetType().GetProperty("Name").GetValue(item, null)}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show($"An error occurred while deleting the directory {item.GetType().GetProperty("NameID").GetValue(item, null)}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
@@ -474,21 +477,63 @@ namespace YouCast
             UpdateFolderSize();
         }
 
+        public string GetChannelNameFromConfig(string channelId)
+        {
+            var videoDirectory = "Videos";
+            
+            if (Directory.Exists(videoDirectory))
+            {
+                var channelDirectory = Path.Combine(videoDirectory, channelId);
+                var channelConfigFilePath = Path.Combine(channelDirectory, "config.xml");
+
+                if (File.Exists(channelConfigFilePath))
+                {
+                    XDocument doc = null;
+                    int retryCount = 5;
+                    while (retryCount > 0)
+                    {
+                        try
+                        {
+                            doc = XDocument.Load(channelConfigFilePath);
+                            break;
+                        }
+                        catch (IOException)
+                        {
+                            retryCount--;
+                            System.Threading.Thread.Sleep(1000); // Czekaj 1 sekundê przed ponown¹ prób¹
+                        }
+                    }
+
+                    if (doc != null)
+                    {
+                        return doc.Root.Element("ChannelName").Value;
+                    }
+                }
+            }
+            return channelId;
+        }
+
         private void UpdateFolderSize()
         {
             var videoDirectory = "Videos";
             if (Directory.Exists(videoDirectory))
             {
+                // Each folder size
                 var directoryInfo = new DirectoryInfo(videoDirectory);
                 var folderSizes = directoryInfo.GetDirectories()
                     .Select(dir => new
                     {
-                        dir.Name,
+                        Name = GetChannelNameFromConfig(dir.Name),
+                        NameID = dir.Name,
                         Size = FormatSize(GetDirectorySize(dir))
                     })
                     .ToList();
 
                 CacheList.ItemsSource = folderSizes;
+
+                // Total size
+                var totalSize = GetDirectorySize(directoryInfo);
+                TotalSize.Content = FormatSize(totalSize);
             }
             else
             {

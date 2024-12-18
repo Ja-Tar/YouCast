@@ -115,7 +115,7 @@
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Name}" Width="200"/>
+                                            <TextBlock Text="{Binding Name}" Uid="{Binding NameID}" Width="200"/>
                                             <TextBlock Text="{Binding Size}" Width="200"/>
                                         </StackPanel>
                                     </DataTemplate>
@@ -123,6 +123,10 @@
                             </ListBox>
                         </DockPanel>
                         <DockPanel>
+                            <DockPanel>
+                                <Label DockPanel.Dock="Left" Content="Total Size:" VerticalContentAlignment="Center"/>
+                                <Label DockPanel.Dock="Right" x:Name="TotalSize" Content="0 MB" VerticalContentAlignment="Center"/>
+                            </DockPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Button 
                                     x:Name="OpenCacheFolder"

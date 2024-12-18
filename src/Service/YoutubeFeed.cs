@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Xml;
 using System.ServiceModel;
 using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
@@ -151,6 +152,7 @@ namespace Service
                 var videoDirectory = "Videos";
                 var channelDirectory = Path.Combine(videoDirectory, videoInfo.Author.ChannelId);
                 var filePath = Path.Combine(channelDirectory, fileName);
+                var channelConfigFilePath = Path.Combine(channelDirectory, "config.xml");
 
                 if (!Directory.Exists(channelDirectory))
                 {
@@ -162,6 +164,14 @@ namespace Service
                     Console.WriteLine(filePath);
 
                     return GenerateFileUri(videoId, videoInfo.Author.ChannelId);
+                }
+
+                if (!File.Exists(channelConfigFilePath))
+                {
+                    var xml = new XElement("FolderConfig",
+                        new XElement("ChannelId", videoInfo.Author.ChannelId),
+                        new XElement("ChannelName", videoInfo.Author.ChannelTitle));
+                    xml.Save(channelConfigFilePath);
                 }
 
                 var resolution = 720;
@@ -186,7 +196,7 @@ namespace Service
                         .Where(s => s.Container == Container.Mp4)
                         .GetWithHighestBitrate();
 
-                    // Select best video stream (1080p60 in this example)
+                    // Select best video stream
                     var videoStreamInfos = streamManifest
                         .GetVideoStreams()
                         .Where(s => s.Container == Container.Mp4)
