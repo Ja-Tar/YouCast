@@ -147,6 +147,9 @@ namespace Service
 
             async Task<string> GetVideoUriAsync()
             {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
                 var videoInfo = await _youtubeClient.Videos.GetAsync(videoId);
                 var fileName = $"{videoInfo.Id}.mp4";
                 var videoDirectory = "Videos";
@@ -297,7 +300,7 @@ namespace Service
                 return null;
             }
 
-            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true);
             context.OutgoingResponse.ContentType = "video/mp4";
 
             return Task.FromResult<Stream>(stream);

@@ -66,6 +66,11 @@ namespace YouCast
 
         private void InitializeFileSystemWatcher()
         {
+            if (!Directory.Exists("Videos"))
+            {
+                Directory.CreateDirectory("Videos");
+            }
+
             _fileSystemWatcher = new FileSystemWatcher
             {
                 Path = "Videos",
