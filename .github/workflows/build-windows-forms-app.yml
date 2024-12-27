@@ -13,6 +13,23 @@ permissions:
 
 on:
   workflow_dispatch:
+    inputs:
+      build:
+        description: 'Configuration to build'
+        required: true
+        default: 'Release'
+        type: choice
+        options:
+          - 'Release'
+          - 'Debug'
+      cpu:
+        description: 'CPU architecture'
+        required: true
+        default: 'Any CPU'
+        type: choice
+        options:
+          - 'x64'
+          - 'Any CPU'
   release:
     types: [created]
   
@@ -22,9 +39,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-
-    - name: Checkout repository
-      uses: actions/checkout@v2
 
     - name: Restore NuGet packages from Cache
       id: cache-restore
@@ -41,15 +55,23 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
 
-    - name: Build
+    - if: ${{ github.event_name == 'workflow_dispatch' }}
+      name: Build ${{ github.event.inputs.build }} ${{ github.event.inputs.cpu }}
+      run: msbuild /p:Configuration="${{ github.event.inputs.build }}" /p:Platform="${{ github.event.inputs.cpu }}"
+    
+    - if: ${{ github.event_name != 'workflow_dispatch' }}
+      name: Build Release
       run: msbuild -property:Configuration=Release
+
+    - name: tree check
+      run: tree 
 
     - if: ${{ github.event_name == 'workflow_dispatch' }}
       name: Artifacts Upload
       uses: actions/upload-artifact@v4
       with:
-        name: release
-        path: src/YouCast/bin/Release/
+        name: art_${{ github.event.inputs.build }}_${{ github.event.inputs.cpu }}
+        path: src/YouCast/bin/${{ github.event.inputs.cpu }}/${{ github.event.inputs.build }}/
         if-no-files-found: error
     
     - if: ${{ github.event_name != 'workflow_dispatch' }}
