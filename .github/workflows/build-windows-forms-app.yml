@@ -12,17 +12,22 @@ permissions:
   statuses: read
 
 on:
+  workflow_dispatch:
   release:
     types: [created]
-
+  
 jobs:
   build:
     runs-on: windows-latest
     
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        cache: true
 
     - name: Restore dependencies
       run: nuget restore
@@ -32,13 +37,23 @@ jobs:
 
     - name: Build
       run: msbuild -property:Configuration=Release
-      
-    - name: Archive artifacts
+
+    - if: ${{ github.event_name == 'workflow_dispatch' }}
+      name: Artifacts Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: release
+        path: src/YouCast/bin/Release/
+        if-no-files-found: error
+    
+    - if: ${{ github.event_name != 'workflow_dispatch' }}
+      name: Archive Release
       run: |
         mkdir -p artifacts
         powershell Compress-Archive -Path src\YouCast\bin\Release\* -DestinationPath artifacts\release.zip
 
-    - name: Upload Release Assets
+    - if: ${{ github.event_name != 'workflow_dispatch' }}
+      name: Upload Release Assets
       uses: alexellis/upload-assets@0.4.1
       env:
         GITHUB_TOKEN: ${{ github.token }}
