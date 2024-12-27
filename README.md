@@ -11,6 +11,17 @@ YouCast allows you to subscribe to channels and playlists on YouTube as video an
 
 <p align="center"><a href="http://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=B8VLNS5S6UBEE"><img style="display: block; margin-left: auto; margin-right: auto;" src="http://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" alt="" /></a></p>
 
+## Important Notice !!!
+
+**This is a fork of the original YouCast project by I3arnon**
+
+This fork is work in progress. Fixes are not tested and may not work as expected.
+
+Added functionality:
+- local muxing of audio and video streams
+- caching of muxed video files
+- cache setting tab used for deleting cached files
+
 ## Features
  - Subscribe to any channel's public video uploads.
  - Subscribe to any public playlist on YouTube.
@@ -24,11 +35,11 @@ YouCast allows you to subscribe to channels and playlists on YouTube as video an
 To get a URL for a podcast:
 
 1. Open YouCast
-1. Enter a YouTube channel's username or playlist ID.
-1. Choose audio or video quality (the better the quality the bigger the file).
-1. Generate and copy the podcast URL.
-1. Paste the URL in your favorite podcast app.
-1. While your app is updating podcasts YouCast must be running.
+2. Enter a YouTube channel's username or playlist ID.
+3. Choose audio or video quality (the better the quality the bigger the file).
+4. Generate and copy the podcast URL.
+5. Paste the URL in your favorite podcast app.
+6. While your app is updating podcasts YouCast must be running.
 
 ### Setting your own API Key
 Google restricts the amount of requests you can make per day with each API key. In order to circumvent this limit, you can set your own API key.
@@ -42,4 +53,5 @@ Google restricts the amount of requests you can make per day with each API key. 
 ## Known Issues
 
 1. Explicit/restricted videos can't be downloaded (they require YouCast to login with a user)
-1. Audio feed episodes on iOS are 2X in length (second half is silent)
+2. Audio feed episodes on iOS are 2X in length (second half is silent)
+3. Muxed streams have stopped working (because of YouTube changes - [YoutubeExplode info](https://github.com/Tyrrrz/YoutubeExplode/releases/tag/6.4.2))
