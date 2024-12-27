@@ -1,0 +1,46 @@
+name: Build Windows Forms App
+
+permissions:
+  contents: write
+  checks: write
+
+  actions: read
+  issues: read
+  packages: write
+  pull-requests: read
+  repository-projects: read
+  statuses: read
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Restore dependencies
+      run: nuget restore
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build
+      run: msbuild -property:Configuration=Release
+      
+    - name: Archive artifacts
+      run: |
+        mkdir -p artifacts
+        powershell Compress-Archive -Path src\YouCast\bin\Release\* -DestinationPath artifacts\release.zip
+
+    - name: Upload Release Assets
+      uses: alexellis/upload-assets@0.4.1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        asset_paths: '["artifacts/release.zip"]'
