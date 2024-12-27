@@ -21,13 +21,19 @@ jobs:
     runs-on: windows-latest
     
     steps:
+    - uses: actions/checkout@v4
+
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - uses: actions/setup-dotnet@v4
+    - name: Restore NuGet packages from Cache
+      id: cache-restore
+      uses: actions/cache/restore@v4
       with:
-        dotnet-version: '9.0.x'
-        cache: true
+        path: |
+          ~/.nuget/packages
+          ~/.local/share/NuGet/Cache
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
 
     - name: Restore dependencies
       run: nuget restore
@@ -59,3 +65,12 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         asset_paths: '["artifacts/release.zip"]'
+    
+    - name: Cache NuGet packages
+      id: cache-save
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          ~/.nuget/packages
+          ~/.local/share/NuGet/Cache
+        key: ${{ steps.cache-restore.outputs.cache-primary-key }}
