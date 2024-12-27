@@ -46,47 +46,66 @@ jobs:
       with:
         path: |
           ~/.nuget/packages
-          ~/.local/share/NuGet/Cache
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
 
-    - name: Restore dependencies
+    - name: Restore dependencies using NuGet
       run: nuget restore
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
 
-    - if: ${{ github.event_name == 'workflow_dispatch' }}
-      name: Build ${{ github.event.inputs.build }} ${{ github.event.inputs.cpu }}
-      run: msbuild /p:Configuration="${{ github.event.inputs.build }}" /p:Platform="${{ github.event.inputs.cpu }}"
-    
-    - if: ${{ github.event_name != 'workflow_dispatch' }}
-      name: Build Release
-      run: msbuild -property:Configuration=Release
 
-    - name: tree check
+    - if: ${{ github.event_name == 'workflow_dispatch' }}
+      name: Build Dispatch
+      run: msbuild /p:Configuration="${{ github.event.inputs.build }}" /p:Platform="${{ github.event.inputs.cpu }}"
+
+    - if: ${{ github.event_name == 'workflow_dispatch' }}
+      name: Debug tree
       run: tree 
 
-    - if: ${{ github.event_name == 'workflow_dispatch' }}
+    - if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.cpu != 'Any CPU' }}
       name: Artifacts Upload
       uses: actions/upload-artifact@v4
       with:
         name: art_${{ github.event.inputs.build }}_${{ github.event.inputs.cpu }}
         path: src/YouCast/bin/${{ github.event.inputs.cpu }}/${{ github.event.inputs.build }}/
         if-no-files-found: error
+
+    - if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.cpu == 'Any CPU' }}
+      name: Artifacts Upload Any CPU
+      uses: actions/upload-artifact@v4
+      with:
+        name: art_${{ github.event.inputs.build }}_${{ github.event.inputs.cpu }}
+        path: src/YouCast/bin/${{ github.event.inputs.build }}/ 
+        if-no-files-found: error
+      
+
+    - if: ${{ github.event_name != 'workflow_dispatch' }}
+      name: Build Release
+      run: msbuild -property:Configuration=Release
     
     - if: ${{ github.event_name != 'workflow_dispatch' }}
       name: Archive Release
       run: |
         mkdir -p artifacts
         powershell Compress-Archive -Path src\YouCast\bin\Release\* -DestinationPath artifacts\release.zip
+      
+    - if: ${{ github.event_name != 'workflow_dispatch' }}
+      name: Build x64 Release
+      run: msbuild -property:Configuration=Release -property:Platform=x64
 
     - if: ${{ github.event_name != 'workflow_dispatch' }}
-      name: Upload Release Assets
+      name: Archive x64 Release
+      run: powershell Compress-Archive -Path src\YouCast\bin\x64\Release\* -DestinationPath artifacts\x64_release.zip
+    
+    - if: ${{ github.event_name != 'workflow_dispatch' }}
+      name: Upload x64 Release Assets
       uses: alexellis/upload-assets@0.4.1
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        asset_paths: '["artifacts/release.zip"]'
+        asset_paths: '["artifacts/x64_release.zip", "artifacts/release.zip"]'
+
     
     - name: Cache NuGet packages
       id: cache-save
@@ -94,5 +113,4 @@ jobs:
       with:
         path: |
           ~/.nuget/packages
-          ~/.local/share/NuGet/Cache
         key: ${{ steps.cache-restore.outputs.cache-primary-key }}
