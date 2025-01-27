@@ -1,17 +1,7 @@
 YouCast
 =======
 
-[![All Releases](https://img.shields.io/github/downloads/i3arnon/YouCast/total.svg)](https://github.com/i3arnon/YouCast/releases)
-[![Release](https://img.shields.io/github/release/i3arnon/YouCast.svg)](https://github.com/i3arnon/YouCast/releases)
-[![License](https://img.shields.io/github/license/i3arnon/YouCast.svg)](LICENSE)
-
-YouCast allows you to subscribe to channels and playlists on YouTube as video and audio podcasts in any standard podcast app (e.g. Overcast, iTunes, BeyondPod, etc.).
-
-<p align="center"><img style="display: block; margin-left: auto; margin-right: auto;" src="https://raw.githubusercontent.com/I3arnon/YouCast/master/src/Screenshot.PNG" alt="Screenshot" width="463" height="295" /></p>
-
-<p align="center"><a href="http://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=B8VLNS5S6UBEE"><img style="display: block; margin-left: auto; margin-right: auto;" src="http://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" alt="" /></a></p>
-
-## Important Notice !!!
+# Important Notice !!!
 
 **This is a fork of the original YouCast project by I3arnon**
 
@@ -21,6 +11,19 @@ Added functionality:
 - local muxing of audio and video streams
 - caching of muxed video files
 - cache setting tab used for deleting cached files
+
+
+# Original README
+
+[![All Releases](https://img.shields.io/github/downloads/i3arnon/YouCast/total.svg)](https://github.com/i3arnon/YouCast/releases)
+[![Release](https://img.shields.io/github/release/i3arnon/YouCast.svg)](https://github.com/i3arnon/YouCast/releases)
+[![License](https://img.shields.io/github/license/i3arnon/YouCast.svg)](LICENSE)
+
+YouCast allows you to subscribe to channels and playlists on YouTube as video and audio podcasts in any standard podcast app (e.g. Overcast, iTunes, BeyondPod, etc.).
+
+<p align="center"><img style="display: block; margin-left: auto; margin-right: auto;" src="https://raw.githubusercontent.com/I3arnon/YouCast/master/src/Screenshot.PNG" alt="Screenshot" width="463" height="295" /></p>
+
+<p align="center"><a href="http://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=B8VLNS5S6UBEE"><img style="display: block; margin-left: auto; margin-right: auto;" src="http://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" alt="" /></a></p>
 
 ## Features
  - Subscribe to any channel's public video uploads.
