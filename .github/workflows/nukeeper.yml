@@ -1,5 +1,9 @@
 name: Update packages
 
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   workflow_dispatch:
   schedule:
@@ -8,11 +12,13 @@ on:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
-    name: Update dependencies
+    runs-on: windows-latest
+
     steps:
-      - name: Nukeeper
-        id: nukeeper
-        uses: NuKeeperDotNet/NuKeeper-Action@0.1
-        with:
-          token: "${{ secrets.NUKEEPER_TOKEN }}"
+    - uses: actions/checkout@v4
+
+    - name: install nukeeper
+      run: dotnet tool install --global nukeeper
+
+    - name: update packages
+      run: nukeeper repo . ${{ github.token }}
