@@ -91,7 +91,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="[4.0.0]" />
+    <PackageReference Include="Costura.Fody" Version="[6.0.0]" />
     <PackageReference Include="YoutubeExplode">
       <Version>6.5.2</Version>
     </PackageReference>
