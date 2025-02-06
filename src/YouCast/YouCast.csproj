@@ -96,7 +96,7 @@
       <Version>6.5.2</Version>
     </PackageReference>
     <PackageReference Include="YoutubeExplode.Converter">
-      <Version>6.5.2</Version>
+      <Version>6.5.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
