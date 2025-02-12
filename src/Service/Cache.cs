@@ -21,8 +21,8 @@ namespace Service
         public bool TryGet(TKey key, out TValue value)
         {
             var exists = _cache.TryGetValue(key, out var cached);
-            value = exists 
-                ? cached.value 
+            value = exists
+                ? cached.value
                 : default;
 
             return exists;
