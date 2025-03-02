@@ -191,7 +191,7 @@ namespace Service
 
                 if (muxedStreamInfos.Count == 0)
                 {
-                    Console.WriteLine("No muxed streams found.");
+                    Console.WriteLine("No muxed streams found for: " + videoId);
 
                     // Select best audio stream (highest bitrate)
                     var audioStreamInfo = streamManifest
@@ -199,7 +199,6 @@ namespace Service
                         .Where(s => s.Container == Container.Mp4)
                         .GetWithHighestBitrate();
 
-                    // Select best video stream
                     var videoStreamInfos = streamManifest
                         .GetVideoStreams()
                         .Where(s => s.Container == Container.Mp4)
@@ -207,9 +206,6 @@ namespace Service
 
                     var videoStreamInfo = videoStreamInfos.FirstOrDefault(_ => _.VideoResolution.Height == resolution) ??
                                          videoStreamInfos.Maxima(_ => _.VideoQuality).FirstOrDefault();
-
-                    Console.WriteLine("Audio stream: " + audioStreamInfo);
-                    Console.WriteLine("Video stream: " + videoStreamInfo);
 
                     // Download and mux streams into a single file
                     var streamInfos = new IStreamInfo[] { audioStreamInfo, videoStreamInfo };
@@ -288,7 +284,7 @@ namespace Service
             if (!Directory.Exists(channelDirectory))
             {
                 context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
-                return null;
+                return Task.FromResult<Stream>(null);
             }
 
             var fileName = $"{videoID}.mp4";
@@ -297,14 +293,113 @@ namespace Service
             if (!File.Exists(filePath))
             {
                 context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
-                return null;
+                return Task.FromResult<Stream>(null);
             }
 
+            var fileInfo = new FileInfo(filePath);
             var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true);
-            context.OutgoingResponse.ContentType = "video/mp4";
 
+            context.OutgoingResponse.ContentType = "video/mp4";
+            context.OutgoingResponse.Headers.Add("Content-Disposition", $"inline; filename={fileName}");
+            context.OutgoingResponse.Headers.Add("Accept-Ranges", "bytes");
+
+            var rangeHeader = context.IncomingRequest.Headers["Range"];
+            if (!string.IsNullOrEmpty(rangeHeader))
+            {
+                Console.WriteLine($"Video Send with Range");
+
+                var range = rangeHeader.Replace("bytes=", "").Split('-');
+                var start = long.Parse(range[0]);
+                var end = range.Length > 1 && !string.IsNullOrEmpty(range[1]) ? long.Parse(range[1]) : fileInfo.Length - 1;
+
+                if (start >= 0 && end >= start && end < fileInfo.Length)
+                {
+                    context.OutgoingResponse.StatusCode = HttpStatusCode.PartialContent;
+                    context.OutgoingResponse.Headers.Add("Content-Range", $"bytes {start}-{end}/{fileInfo.Length}");
+                    context.OutgoingResponse.ContentLength = end - start + 1;
+
+                    stream.Seek(start, SeekOrigin.Begin);
+                    return Task.FromResult<Stream>(new PartialStream(stream, start, end));
+                }
+            } else {
+                Console.WriteLine($"Video Send");
+            }
+
+            context.OutgoingResponse.ContentLength = fileInfo.Length;
             return Task.FromResult<Stream>(stream);
         }
+
+        public class PartialStream : Stream
+        {
+            private readonly Stream _innerStream;
+            private readonly long _start;
+            private readonly long _end;
+            private long _position;
+
+            public PartialStream(Stream innerStream, long start, long end)
+            {
+                _innerStream = innerStream;
+                _start = start;
+                _end = end;
+                _position = start;
+            }
+
+            public override bool CanRead => _innerStream.CanRead;
+            public override bool CanSeek => _innerStream.CanSeek;
+            public override bool CanWrite => false;
+            public override long Length => _end - _start + 1;
+            public override long Position
+            {
+                get => _position - _start;
+                set => Seek(value, SeekOrigin.Begin);
+            }
+
+            public override void Flush() => _innerStream.Flush();
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                if (_position > _end)
+                {
+                    return 0;
+                }
+
+                var bytesToRead = (int)Math.Min(count, _end - _position + 1);
+                var bytesRead = _innerStream.Read(buffer, offset, bytesToRead);
+                _position += bytesRead;
+                return bytesRead;
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                long newPosition;
+                switch (origin)
+                {
+                    case SeekOrigin.Begin:
+                        newPosition = _start + offset;
+                        break;
+                    case SeekOrigin.Current:
+                        newPosition = _position + offset;
+                        break;
+                    case SeekOrigin.End:
+                        newPosition = _end + offset;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(origin), origin, null);
+                }
+
+                if (newPosition < _start || newPosition > _end)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(offset), offset, null);
+                }
+
+                _position = newPosition;
+                return _innerStream.Seek(newPosition, SeekOrigin.Begin) - _start;
+            }
+
+            public override void SetLength(long value) => throw new NotSupportedException();
+            public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        }
+
 
         private async Task<IEnumerable<SyndicationItem>> GenerateItemsAsync(
             string baseAddress,
