@@ -74,7 +74,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="YoutubeExplode" Version="6.5.3" />
     <PackageReference Include="YoutubeExplode.Converter">
-      <Version>6.5.3</Version>
+      <Version>6.5.4</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
