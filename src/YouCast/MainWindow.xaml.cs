@@ -206,7 +206,6 @@ namespace YouCast
             OpenServiceHost();
         }
 
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         private static void SetFirewallRule()
         {
             var isExists = !Process.Start(
@@ -560,10 +559,7 @@ namespace YouCast
             {
                 return $"{sizeInBytes / (double)OneGB:F2} GB";
             }
-            else
-            {
-                return $"{sizeInBytes / (double)OneMB:F2} MB";
-            }
+            return $"{sizeInBytes / (double)OneMB:F2} MB";
         }
 
         private void OpenCacheFolder_OnClick(object sender, RoutedEventArgs e)
