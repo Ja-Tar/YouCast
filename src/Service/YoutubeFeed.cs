@@ -306,7 +306,7 @@ namespace Service
             var rangeHeader = context.IncomingRequest.Headers["Range"];
             if (!string.IsNullOrEmpty(rangeHeader))
             {
-                Console.WriteLine($"Video Send with Range");
+                Console.WriteLine("Video Send with Range");
 
                 var range = rangeHeader.Replace("bytes=", "").Split('-');
                 var start = long.Parse(range[0]);
@@ -324,7 +324,7 @@ namespace Service
             }
             else
             {
-                Console.WriteLine($"Video Send");
+                Console.WriteLine("Video Send");
             }
 
             context.OutgoingResponse.ContentLength = fileInfo.Length;
