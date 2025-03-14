@@ -147,9 +147,6 @@ namespace Service
 
             async Task<string> GetVideoUriAsync()
             {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-
                 var videoInfo = await _youtubeClient.Videos.GetAsync(videoId);
                 var fileName = $"{videoInfo.Id}.mp4";
                 var videoDirectory = "Videos";
