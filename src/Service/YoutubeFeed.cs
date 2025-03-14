@@ -321,7 +321,9 @@ namespace Service
                     stream.Seek(start, SeekOrigin.Begin);
                     return Task.FromResult<Stream>(new PartialStream(stream, start, end));
                 }
-            } else {
+            }
+            else
+            {
                 Console.WriteLine($"Video Send");
             }
 
