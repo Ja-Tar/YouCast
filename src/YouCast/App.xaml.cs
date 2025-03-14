@@ -20,7 +20,7 @@ namespace YouCast
             {
                 // It is not possible to launch a ClickOnce app as administrator directly, so instead we launch the
                 // app as administrator in a new process.
-                var processInfo = new ProcessStartInfo(Assembly.GetExecutingAssembly().CodeBase)
+                var processInfo = new ProcessStartInfo(typeof(App).Assembly.CodeBase)
                 {
                     UseShellExecute = true,
                     Verb = "runas"

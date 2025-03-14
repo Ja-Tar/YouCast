@@ -281,7 +281,7 @@ namespace Service
             if (!Directory.Exists(channelDirectory))
             {
                 context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
-                return Task.FromResult<Stream>(null);
+                return Task.FromException<Stream>(new FileNotFoundException());
             }
 
             var fileName = $"{videoID}.mp4";
@@ -290,7 +290,7 @@ namespace Service
             if (!File.Exists(filePath))
             {
                 context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
-                return Task.FromResult<Stream>(null);
+                return Task.FromException<Stream>(new FileNotFoundException());
             }
 
             var fileInfo = new FileInfo(filePath);
