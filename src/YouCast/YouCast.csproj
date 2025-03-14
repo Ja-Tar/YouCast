@@ -93,7 +93,7 @@
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="[4.0.0]" />
     <PackageReference Include="YoutubeExplode">
-      <Version>6.5.3</Version>
+      <Version>6.5.4</Version>
     </PackageReference>
     <PackageReference Include="YoutubeExplode.Converter">
       <Version>6.5.4</Version>
