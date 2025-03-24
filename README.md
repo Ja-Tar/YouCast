@@ -14,7 +14,6 @@ Added functionality:
 - caching of muxed video files
 - cache setting tab used for deleting cached files
 
-
 # Original README
 
 [![All Releases](https://img.shields.io/github/downloads/i3arnon/YouCast/total.svg)](https://github.com/i3arnon/YouCast/releases)
