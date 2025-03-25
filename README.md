@@ -13,6 +13,7 @@ Added functionality:
 - local muxing of audio and video streams
 - caching of muxed video files
 - cache setting tab used for deleting cached files
+- HTTP range support for playing cached files
 
 # Original README
 
