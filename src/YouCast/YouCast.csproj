@@ -91,11 +91,15 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Costura.Fody">
+    <PackageReference Include="Costura.Fody" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="YoutubeExplode" />
-    <PackageReference Include="YoutubeExplode.Converter" />
+    <PackageReference Include="YoutubeExplode">
+      <Version>6.5.4</Version>
+    </PackageReference>
+    <PackageReference Include="YoutubeExplode.Converter">
+      <Version>6.5.4</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" Exclude="Properties\**;obj\**" />
