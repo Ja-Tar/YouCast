@@ -497,7 +497,7 @@ namespace YouCast
         public string GetChannelNameFromConfig(string channelId)
         {
             var videoDirectory = "Videos";
-            
+
             if (Directory.Exists(videoDirectory))
             {
                 var channelDirectory = Path.Combine(videoDirectory, channelId);
