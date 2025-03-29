@@ -216,15 +216,33 @@
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
                     <Image HorizontalAlignment="Left" Source="rss.ico" Height="90" />
-                    <Button 
-                        x:Name="YoucastLink" 
-                        Style="{StaticResource LinkButton}"  
-                        Click="YoucastLink_OnClick" Content="YouCast v2.24."/>
-                    <Label VerticalAlignment="Center" Content="Made by"/>
-                    <Button 
-                        x:Name="TwitterLink" 
-                        Style="{StaticResource LinkButton}"  
-                        Click="TwitterLink_OnClick" Content="@i3arnon."/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                            <Label Content="{x:Static youCast:GeneralInformation.ApplicationName}" FontSize="20"/>
+                            <Button 
+                                FontSize="13"
+                                x:Name="YoucastLink" 
+                                Style="{StaticResource LinkButton}"  
+                                Click="YoucastLink_OnClick" 
+                                Content="{Binding Source={x:Static youCast:GeneralInformation.ApplicationVersion}}" HorizontalAlignment="Right" Margin="0,0,7,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                            <StackPanel Orientation="Horizontal">
+                                <Label VerticalAlignment="Center" Content="Made by"/>
+                                <Button 
+                                    x:Name="TwitterLink" 
+                                    Style="{StaticResource LinkButton}"  
+                                    Click="TwitterLink_OnClick" Content="@i3arnon."/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label VerticalAlignment="Center" Content="Forked by"/>
+                                <Button 
+                                    x:Name="ForkLink" 
+                                    Style="{StaticResource LinkButton}"  
+                                    Click="ForkLink_OnClick" Content="JaTar."/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </TabItem>

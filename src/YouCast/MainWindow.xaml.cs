@@ -443,6 +443,9 @@ namespace YouCast
         private void GplLink_OnClick(object sender, RoutedEventArgs e) =>
             Process.Start("https://github.com/i3arnon/YouCast/blob/master/LICENSE");
 
+        private void ForkLink_OnClick(object sender, RoutedEventArgs e) =>
+            Process.Start("https://github.com/Ja-Tar/YouCast");
+
         private void ClearVideoCache_OnClick(object sender, RoutedEventArgs e)
         {
             var selectedItems = CacheList.SelectedItems.Cast<object>().ToList();
