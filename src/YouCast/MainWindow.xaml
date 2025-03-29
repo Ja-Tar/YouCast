@@ -196,7 +196,7 @@
                                        HorizontalAlignment="Center" 
                                        VerticalAlignment="Center" 
                                        Padding="3,5,1,5"/>
-                                <ComboBox x:Name="ShortsSettings" 
+                                <ComboBox x:Name="ShortsSetting" 
                                           DockPanel.Dock="Left" 
                                           SelectedIndex="0" 
                                           HorizontalAlignment="Center" 

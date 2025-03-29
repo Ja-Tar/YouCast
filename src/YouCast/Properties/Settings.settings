@@ -26,11 +26,5 @@
     <Setting Name="ApiKey" Type="System.String" Scope="User">
       <Value Profile="(Default)">API_KEY</Value>
     </Setting>
-    <Setting Name="ShortsConfig" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="LiveConfig" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
   </Settings>
 </SettingsFile>
