@@ -47,8 +47,9 @@ jobs:
         path: |
           ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: ${{ runner.os }}-nuget
     
-    - name: Restore build directors from Cache
+    - name: Restore build directories from Cache
       id: cache-restore-build
       uses: actions/cache/restore@v4
       with:
