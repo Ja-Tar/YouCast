@@ -34,6 +34,8 @@ namespace YouCast
         private WebServiceHost _serviceHost;
         private FileSystemWatcher _fileSystemWatcher;
 
+        public event EventHandler<EventArgs> SettingsChanged;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -441,6 +443,9 @@ namespace YouCast
             Settings.Default.StartupWindowState = StartMinimized.IsChecked.Value
                 ? WindowState.Minimized
                 : WindowState.Normal;
+            Settings.Default.ShortsConfig = ShortsSettings.SelectedIndex;
+            Settings.Default.LiveConfig = LiveStreamsSetting.SelectedIndex;
+            SettingsChanged?.Invoke(this, ShortsSettings.SelectedIndex, LiveStreamsSetting.SelectedIndex);
             Settings.Default.Save();
         }
 
@@ -586,16 +591,6 @@ namespace YouCast
             {
                 MessageBox.Show("The video cache directory does not exist.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-        }
-
-        private void LiveStreams_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
-        private void ShortsSettings_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-
         }
     }
 }

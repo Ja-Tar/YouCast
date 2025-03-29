@@ -202,8 +202,7 @@
                                           HorizontalAlignment="Center" 
                                           VerticalAlignment="Bottom" 
                                           Padding="3,0,0,3" 
-                                          Margin="0,0,0,2" 
-                                          DataContextChanged="ShortsSettings_DataContextChanged">
+                                          Margin="0,0,0,2">
                                     <ListBoxItem Content="do nothing"/>
                                     <ListBoxItem Content="add title info"/>
                                     <ListBoxItem Content="hide"/>
@@ -213,14 +212,13 @@
                                        VerticalAlignment="Center" 
                                        Margin="2,0,0,0" 
                                        Padding="5,5,1,5"/>
-                                <ComboBox x:Name="LiveStreams" 
+                                <ComboBox x:Name="LiveStreamsSetting" 
                                           DockPanel.Dock="Left" 
                                           SelectedIndex="0" 
                                           HorizontalAlignment="Center" 
                                           VerticalAlignment="Bottom" 
                                           Padding="3,0,0,3" 
-                                          Margin="0,0,0,2"
-                                          DataContextChanged="LiveStreams_DataContextChanged">
+                                          Margin="0,0,0,2">
                                     <ListBoxItem Content="do nothing"/>
                                     <ListBoxItem Content="add title info"/>
                                     <ListBoxItem Content="hide"/>

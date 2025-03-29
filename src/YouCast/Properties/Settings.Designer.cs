@@ -122,9 +122,9 @@ namespace YouCast.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public byte ShortsConfig {
+        public int ShortsConfig {
             get {
-                return ((byte)(this["ShortsConfig"]));
+                return ((int)(this["ShortsConfig"]));
             }
             set {
                 this["ShortsConfig"] = value;
@@ -134,9 +134,9 @@ namespace YouCast.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public byte LiveConfig {
+        public int LiveConfig {
             get {
-                return ((byte)(this["LiveConfig"]));
+                return ((int)(this["LiveConfig"]));
             }
             set {
                 this["LiveConfig"] = value;
