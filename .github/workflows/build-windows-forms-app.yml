@@ -56,6 +56,7 @@ jobs:
           src/**/bin
           src/**/obj
         key: ${{ runner.os }}-build-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-build
 
     - name: Restore dependencies using NuGet
       run: nuget restore
