@@ -587,5 +587,15 @@ namespace YouCast
                 MessageBox.Show("The video cache directory does not exist.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+
+        private void LiveStreams_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+
+        }
+
+        private void ShortsSettings_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+
+        }
     }
 }

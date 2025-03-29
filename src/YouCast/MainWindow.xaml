@@ -62,9 +62,9 @@
                         </DockPanel>
                     </StackPanel>
                 </GroupBox>
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,5,0,0">
                     <CheckBox 
-                        x:Name="CheckBox" Margin="5,5,5,0" 
+                        x:Name="CheckBox" Margin="5,0,5,0" 
                         ToolTip="The popular videos will have an older publish date."
                         VerticalContentAlignment="Center" Content="Sort by Popularity"/>
                     <Button 
@@ -72,7 +72,7 @@
                         ToolTip="Create a link and add it to your favorite podcatcher"
                         IsDefault="True"
                         IsEnabled="False"
-                        Margin="5,5,5,0"
+                        Margin="5,0,5,0"
                         Height="26"
                         Click="Generate_Click"
                         Content="Generate &amp; Copy URL"/>
@@ -146,7 +146,7 @@
             <StackPanel>
                 <GroupBox>
                     <GroupBox.Header>
-                        <Label Content="Server Details"/>
+                        <Label Content="Server Details" Padding="5,2,5,3"/>
                     </GroupBox.Header>
                     <StackPanel>
                         <DockPanel>
@@ -181,11 +181,51 @@
                 </GroupBox>
                 <GroupBox>
                     <GroupBox.Header>
-                        <Label Content="Configurations"/>
+                        <Label Content="Configurations" Padding="5,3,5,1"/>
                     </GroupBox.Header>
                     <StackPanel>
                         <DockPanel>
-                            <CheckBox x:Name="StartMinimized" DockPanel.Dock="Right" Content="Start Minimized"/>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox x:Name="StartMinimized" 
+                                          DockPanel.Dock="Right" 
+                                          Content="Start Minimized" 
+                                          Margin="0,1,5,0" 
+                                          HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center"/>
+                                <Label Content="Shorts:" 
+                                       HorizontalAlignment="Center" 
+                                       VerticalAlignment="Center" 
+                                       Padding="3,5,1,5"/>
+                                <ComboBox x:Name="ShortsSettings" 
+                                          DockPanel.Dock="Left" 
+                                          SelectedIndex="0" 
+                                          HorizontalAlignment="Center" 
+                                          VerticalAlignment="Bottom" 
+                                          Padding="3,0,0,3" 
+                                          Margin="0,0,0,2" 
+                                          DataContextChanged="ShortsSettings_DataContextChanged">
+                                    <ListBoxItem Content="do nothing"/>
+                                    <ListBoxItem Content="add title info"/>
+                                    <ListBoxItem Content="hide"/>
+                                </ComboBox>
+                                <Label Content="Live streams:" 
+                                       HorizontalAlignment="Center" 
+                                       VerticalAlignment="Center" 
+                                       Margin="2,0,0,0" 
+                                       Padding="5,5,1,5"/>
+                                <ComboBox x:Name="LiveStreams" 
+                                          DockPanel.Dock="Left" 
+                                          SelectedIndex="0" 
+                                          HorizontalAlignment="Center" 
+                                          VerticalAlignment="Bottom" 
+                                          Padding="3,0,0,3" 
+                                          Margin="0,0,0,2"
+                                          DataContextChanged="LiveStreams_DataContextChanged">
+                                    <ListBoxItem Content="do nothing"/>
+                                    <ListBoxItem Content="add title info"/>
+                                    <ListBoxItem Content="hide"/>
+                                </ComboBox>
+                            </StackPanel>
                         </DockPanel>
                         <DockPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
