@@ -94,34 +94,52 @@ namespace YouCast.Properties {
                 this["UseCloudService"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("APP_NAME")]
-        public string ApplicationName 
-        {
-            get
-            {
-                return (string)this["ApplicationName"];
+        public string ApplicationName {
+            get {
+                return ((string)(this["ApplicationName"]));
             }
-            set
-            {
+            set {
                 this["ApplicationName"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("API_KEY")]
-        public string ApiKey
-        {
-            get
-            {
-                return (string)this["ApiKey"];
+        public string ApiKey {
+            get {
+                return ((string)(this["ApiKey"]));
             }
-            set
-            {
+            set {
                 this["ApiKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte ShortsConfig {
+            get {
+                return ((byte)(this["ShortsConfig"]));
+            }
+            set {
+                this["ShortsConfig"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte LiveConfig {
+            get {
+                return ((byte)(this["LiveConfig"]));
+            }
+            set {
+                this["LiveConfig"] = value;
             }
         }
     }
