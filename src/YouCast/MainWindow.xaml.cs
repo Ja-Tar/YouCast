@@ -105,6 +105,11 @@ namespace YouCast
         {
             ApplicationName.Text = Settings.Default.ApplicationName;
             ApiKey.Text = Settings.Default.ApiKey;
+
+            if (AreApiSettingsEmpty())
+            {
+                ApiSettingsTab.IsSelected = true;
+            }
         }
 
         private void LoadNetworkSettings()
@@ -319,6 +324,11 @@ namespace YouCast
             _gotFocus = true;
         }
 
+        private bool AreApiSettingsEmpty()
+        {
+            return string.IsNullOrWhiteSpace(ApplicationName.Text) || string.IsNullOrWhiteSpace(ApiKey.Text) || ApplicationName.Text == "APP_NAME" || ApiKey.Text == "API_KEY";
+        }
+
         private void _input_TextChanged_1(object sender, TextChangedEventArgs e)
         {
             if (Generate == null)
@@ -326,7 +336,7 @@ namespace YouCast
                 return;
             }
 
-            Generate.IsEnabled = !string.IsNullOrWhiteSpace(Input.Text);
+            Generate.IsEnabled = !string.IsNullOrWhiteSpace(Input.Text) && !AreApiSettingsEmpty();
         }
 
         private void ComboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
@@ -507,7 +517,7 @@ namespace YouCast
                         catch (IOException)
                         {
                             retryCount--;
-                            System.Threading.Thread.Sleep(1000); // Czekaj 1 sekundê przed ponown¹ prób¹
+                            System.Threading.Thread.Sleep(1000); // Czekaj 1 sekundï¿½ przed ponownï¿½ prï¿½bï¿½
                         }
                     }
 
