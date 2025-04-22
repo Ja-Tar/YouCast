@@ -60,6 +60,7 @@ namespace YouCast
             PopulateQualities();
             LoadApiSettings();
             LoadNetworkSettings();
+            LoadContentSettings();
             InitializeFileSystemWatcher();
             UpdateFolderSize();
         }
@@ -431,6 +432,12 @@ namespace YouCast
             Settings.Default.Save();
         }
 
+        private void LoadContentSettings()
+        {
+            ShortsSetting.SelectedIndex = Service.Properties.Settings.Default.ShortsConfig;
+            LiveStreamsSetting.SelectedIndex = Service.Properties.Settings.Default.LiveConfig;
+        }
+
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
             if (!StartMinimized.IsChecked.HasValue)
@@ -441,6 +448,9 @@ namespace YouCast
             Settings.Default.StartupWindowState = StartMinimized.IsChecked.Value
                 ? WindowState.Minimized
                 : WindowState.Normal;
+            Service.Properties.Settings.Default.ShortsConfig = ShortsSetting.SelectedIndex;
+            Service.Properties.Settings.Default.LiveConfig = LiveStreamsSetting.SelectedIndex;
+            Service.Properties.Settings.Default.Save();
             Settings.Default.Save();
         }
 
