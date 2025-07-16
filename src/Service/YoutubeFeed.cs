@@ -191,10 +191,20 @@ namespace Service
                     Console.WriteLine("No muxed streams found for: " + videoId);
 
                     // Select best audio stream (highest bitrate)
-                    var audioStreamInfo = streamManifest
+                    var audioStreamList = streamManifest
                         .GetAudioStreams()
-                        .Where(s => s.Container == Container.Mp4)
-                        .GetWithHighestBitrate();
+                        .Where(s => s.Container == Container.Mp4);
+
+                    var audioLang = audioStreamList
+                        .Select(s => s.AudioLanguage)
+                        .Where(lang => lang != null)
+                        .Distinct()
+                        .ToList();
+
+                    var audioStreamInfo = audioStreamList
+                        .Where(s => s.AudioLanguage == null || audioLang.Count == 1 || (s.AudioLanguage?.Name.Contains("original") ?? false))
+                        .Maxima(s => s.Bitrate)
+                        .FirstOrDefault();
 
                     var videoStreamInfos = streamManifest
                         .GetVideoStreams()
