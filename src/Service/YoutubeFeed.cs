@@ -267,7 +267,7 @@ namespace Service
                 .Distinct()
                 .ToList();
 
-            if (audioLangList?.Any(lang => lang?.Name.Contains(language.ToString()) ?? false) ?? false)
+            if (audioLangList?.Any(lang => lang?.Name.Contains(language.ToString()) == true) == true)
             {
                 Console.WriteLine($"Using {language} audio");
             }
@@ -280,7 +280,7 @@ namespace Service
             // Get highest bitrate audio stream with selected language
             var audioStream = audioStreamList
                 .Where(s => audioLangList.Count <= 0
-                            || (s.AudioLanguage?.Name.Contains(language.ToString().Replace("Original", "original")) ?? false))
+                            || (s.AudioLanguage?.Name.Contains(language.ToString().Replace("Original", "original")) == true))
                 .Maxima(s => s.Bitrate)
                 .FirstOrDefault();
 
