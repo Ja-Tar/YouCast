@@ -247,7 +247,7 @@ namespace Service
                 var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
                 AudioOnlyStreamInfo audios = GetAudioStreamsByLanguage(streamManifest, languageString);
 
-                return audios?.Url ?? null;
+                return audios?.Url;
             }
         }
 
@@ -273,7 +273,7 @@ namespace Service
             }
             else
             {
-                Console.WriteLine($"Using Original audio");
+                Console.WriteLine("Using Original audio");
                 language = YouTubeLang.Original;
             }
 
