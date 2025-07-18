@@ -7,7 +7,7 @@
         public string Language { get; }
         public int MaxLength { get; }
         public bool IsPopular { get; }
-     
+
         public Arguments(string playlistId, string encoding, string language, int maxLength, bool isPopular)
         {
             PlaylistId = playlistId;
