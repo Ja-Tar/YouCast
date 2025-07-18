@@ -4,13 +4,15 @@
     {
         public string PlaylistId { get; }
         public string Encoding { get; }
+        public string Language { get; }
         public int MaxLength { get; }
         public bool IsPopular { get; }
-
-        public Arguments(string playlistId, string encoding, int maxLength, bool isPopular)
+     
+        public Arguments(string playlistId, string encoding, string language, int maxLength, bool isPopular)
         {
             PlaylistId = playlistId;
             Encoding = encoding;
+            Language = language;
             MaxLength = maxLength;
             IsPopular = isPopular;
 
@@ -23,6 +25,7 @@
         private bool Equals(Arguments other) =>
             string.Equals(PlaylistId, other.PlaylistId) &&
             string.Equals(Encoding, other.Encoding) &&
+            string.Equals(Language, other.Language) &&
             MaxLength == other.MaxLength &&
             IsPopular == other.IsPopular;
 
@@ -36,6 +39,7 @@
             {
                 var hashCode = (PlaylistId != null ? PlaylistId.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Encoding != null ? Encoding.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Language != null ? Language.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ MaxLength;
                 hashCode = (hashCode * 397) ^ IsPopular.GetHashCode();
                 return hashCode;
@@ -43,6 +47,6 @@
         }
 
         public override string ToString() =>
-            string.Join(",", PlaylistId, Encoding.ToLower(), MaxLength, IsPopular);
+            string.Join(",", PlaylistId, Encoding.ToLower(), Language.ToLower(), MaxLength, IsPopular);
     }
 }

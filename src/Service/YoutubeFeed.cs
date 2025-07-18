@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Xml;
 using System.ServiceModel;
 using System.ServiceModel.Syndication;
 using System.ServiceModel.Web;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using System.Text.RegularExpressions;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3.Data;
 using MoreLinq;
 using YoutubeExplode;
 using YoutubeExplode.Converter;
+using YoutubeExplode.Exceptions;
 using YoutubeExplode.Videos.Streams;
 using Video = Google.Apis.YouTube.v3.Data.Video;
 using YouTubeService = Google.Apis.YouTube.v3.YouTubeService;
@@ -49,6 +49,7 @@ namespace Service
         public async Task<SyndicationFeedFormatter> GetUserFeedAsync(
             string userId,
             string encoding,
+            string language,
             int maxLength,
             bool isPopular)
         {
@@ -63,6 +64,7 @@ namespace Service
                 var arguments = new Arguments(
                     channel.ContentDetails.RelatedPlaylists.Uploads,
                     encoding,
+                    language,
                     maxLength,
                     isPopular);
 
@@ -75,7 +77,7 @@ namespace Service
                     Items = await GenerateItemsAsync(
                     baseAddress,
                         channel.Snippet.PublishedAt.GetValueOrDefault().ToUniversalTime(),
-                        // PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
+                        // NOTE: PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
                         arguments)
                 };
             }
@@ -106,6 +108,7 @@ namespace Service
         public async Task<SyndicationFeedFormatter> GetPlaylistFeedAsync(
             string playlistId,
             string encoding,
+            string language,
             int maxLength,
             bool isPopular)
         {
@@ -117,6 +120,7 @@ namespace Service
                     new Arguments(
                         playlistId,
                         encoding,
+                        language,
                         maxLength,
                         isPopular);
 
@@ -135,13 +139,13 @@ namespace Service
                     Items = await GenerateItemsAsync(
                         baseAddress,
                         playlist.Snippet.PublishedAt.GetValueOrDefault().ToUniversalTime(),
-                        // PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
+                        // NOTE: PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
                         arguments)
                 };
             }
         }
 
-        public async Task GetVideoAsync(string videoId, string encoding)
+        public async Task GetVideoAsync(string videoId, string encoding, string languageString)
         {
             await GetContentAsync(GetVideoUriAsync);
 
@@ -183,31 +187,32 @@ namespace Service
                 {
                 }
 
-                var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
+
+                Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
+
+                StreamManifest streamManifest;
+
+                try
+                {
+                    streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error fetching stream manifest for video {videoId}: {ex.Message}");
+                    // TODO: more error info
+                    // TODO: popup or some kind of info in the UI
+                    return null;
+                }
                 var muxedStreamInfos = streamManifest.GetMuxedStreams().ToList();
 
                 if (muxedStreamInfos.Count == 0)
                 {
                     Console.WriteLine("No muxed streams found for: " + videoId);
 
-                    // Select best audio stream (highest bitrate)
-                    var audioStreamList = streamManifest
-                        .GetAudioStreams()
-                        .Where(s => s.Container == Container.Mp4);
-
-                    var audioLang = audioStreamList
-                        .Select(s => s.AudioLanguage)
-                        .Where(lang => lang != null)
-                        .Distinct()
-                        .ToList();
-
-                    var audioStreamInfo = audioStreamList
-                        .Where(s => s.AudioLanguage == null || audioLang.Count == 1 || (s.AudioLanguage?.Name.Contains("original") ?? false))
-                        .Maxima(s => s.Bitrate)
-                        .FirstOrDefault();
+                    AudioOnlyStreamInfo audioStreamInfo = GetAudioStreamsByLanguage(streamManifest, languageString);
 
                     var videoStreamInfos = streamManifest
-                        .GetVideoStreams()
+                        .GetVideoOnlyStreams()
                         .Where(s => s.Container == Container.Mp4)
                         .ToList();
 
@@ -233,18 +238,53 @@ namespace Service
             string GenerateFileUri(string _videoId, string _channelId) => $"File.mp4?videoId={_videoId}&channelId={_channelId}";
         }
 
-        public async Task GetAudioAsync(string videoId)
+        public async Task GetAudioAsync(string videoId, string languageString)
         {
             await GetContentAsync(GetAudioUriAsync);
 
             async Task<string> GetAudioUriAsync()
             {
                 var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
-                var audios = streamManifest.GetAudioOnlyStreams().ToList();
-                return audios.Count > 0
-                    ? audios.Maxima(audio => audio.Bitrate).FirstOrDefault().Url
-                    : null;
+                AudioOnlyStreamInfo audios = GetAudioStreamsByLanguage(streamManifest, languageString);
+
+                return audios?.Url ?? null;
             }
+        }
+
+        private AudioOnlyStreamInfo GetAudioStreamsByLanguage(StreamManifest streamManifest, string languageString)
+        {
+            Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
+
+            // All streams
+            var audioStreamList = streamManifest
+                .GetAudioOnlyStreams()
+                .Where(s => s.Container == Container.Mp4);
+
+            // Language list
+            var audioLangList = audioStreamList
+                .Select(s => s.AudioLanguage)
+                .Where(lang => lang != null)
+                .Distinct()
+                .ToList();
+
+            if (audioLangList?.Any(lang => lang?.Name.Contains(language.ToString()) ?? false) ?? false)
+            {
+                Console.WriteLine($"Using {language} audio");
+            }
+            else
+            {
+                Console.WriteLine($"Using Original audio");
+                language = YouTubeLang.Original;
+            }
+
+            // Get highest bitrate audio stream with selected language
+            var audioStream = audioStreamList
+                .Where(s => audioLangList.Count <= 0
+                            || (s.AudioLanguage?.Name.Contains(language.ToString().Replace("Original", "original")) ?? false))
+                .Maxima(s => s.Bitrate)
+                .FirstOrDefault();
+
+            return audioStream;
         }
 
         private async Task<SyndicationFeedFormatter> GetFeedFormatterAsync(Func<string, Task<ItunesFeed>> getFeedAsync)
@@ -454,7 +494,7 @@ namespace Service
             {
                 Id = playlistItem.Snippet.ResourceId.VideoId,
                 PublishDate = playlistItem.Snippet.PublishedAt.GetValueOrDefault().ToUniversalTime(),
-                // PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
+                // NOTE: PublishedAt is Obsolete but PublishedAtDateTimeOffset is making some requests fail | bug report https://github.com/dotnet/runtime/issues/9364
                 Summary = new TextSyndicationContent(RemoveEmojis(playlistItem.Snippet.Description)),
             };
 
@@ -466,7 +506,7 @@ namespace Service
                         new XAttribute("type", "audio/mp4"),
                         new XAttribute(
                             "url",
-                            baseAddress + $"/Audio.m4a?videoId={playlistItem.Snippet.ResourceId.VideoId}")).CreateReader());
+                            baseAddress + $"/Audio.m4a?videoId={playlistItem.Snippet.ResourceId.VideoId}&language={arguments.Language}")).CreateReader());
             }
             else
             {
@@ -476,7 +516,7 @@ namespace Service
                         new XAttribute("type", "video/mp4"),
                         new XAttribute(
                             "url",
-                            baseAddress + $"/Video.mp4?videoId={playlistItem.Snippet.ResourceId.VideoId}&encoding={arguments.Encoding}")).CreateReader());
+                            baseAddress + $"/Video.mp4?videoId={playlistItem.Snippet.ResourceId.VideoId}&encoding={arguments.Encoding}&language={arguments.Language}")).CreateReader());
             }
 
             return item;

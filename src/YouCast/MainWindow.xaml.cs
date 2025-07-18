@@ -58,6 +58,7 @@ namespace YouCast
                 AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToString();
 
             PopulateQualities();
+            PopulateLanguages();
             LoadApiSettings();
             LoadNetworkSettings();
             InitializeFileSystemWatcher();
@@ -99,6 +100,16 @@ namespace YouCast
             }
 
             Quality.SelectedIndex = 0;
+        }
+
+        private void PopulateLanguages()
+        {
+            foreach (var value in Enum.GetValues(typeof(YouTubeLang)))
+            {
+                LanguageBox.Items.Add(value.ToString());
+            }
+
+            LanguageBox.SelectedIndex = 0;
         }
 
         private void LoadApiSettings()
@@ -150,8 +161,11 @@ namespace YouCast
                 typeof(YouTubeEncoding),
                 ((string)Quality.SelectedItem).Replace("@", "_"));
 
-            int maxLength;
-            int.TryParse(MaxLength.Text, out maxLength);
+            var language = (YouTubeLang)Enum.Parse(
+                typeof(YouTubeLang),
+                (string)LanguageBox.SelectedItem);
+
+            int.TryParse(MaxLength.Text, out int maxLength);
             if (maxLength < 0)
             {
                 maxLength = 0;
@@ -161,24 +175,25 @@ namespace YouCast
                 Input.Text.Trim(),
                 encoding,
                 maxLength,
-                CheckBox.IsChecked.HasValue && CheckBox.IsChecked.Value);
+                CheckBox.IsChecked.HasValue && CheckBox.IsChecked.Value,
+                language);
 
             Output.Text = url;
             Clipboard.SetDataObject(url);
         }
 
-        private string GenerateUrl(string userId, YouTubeEncoding encoding, int maxLength, bool isPopular)
+        private string GenerateUrl(string userId, YouTubeEncoding encoding, int maxLength, bool isPopular, YouTubeLang language)
         {
             userId = WebUtility.UrlEncode(userId);
             var selectedItem = ComboBox.SelectedItem as ListBoxItem;
             if (Equals(selectedItem, UserNameItem))
             {
-                return $"{_baseAddress}/GetUserFeed?userId={userId}&encoding={encoding}&maxLength={maxLength}&isPopular={isPopular}";
+                return $"{_baseAddress}/GetUserFeed?userId={userId}&encoding={encoding}&language={language}&maxLength={maxLength}&isPopular={isPopular}";
             }
 
             if (Equals(selectedItem, PlaylistItem))
             {
-                return $"{_baseAddress}/GetPlaylistFeed?playlistId={userId}&encoding={encoding}&maxLength={maxLength}&isPopular={isPopular}";
+                return $"{_baseAddress}/GetPlaylistFeed?playlistId={userId}&encoding={encoding}&language={language}&maxLength={maxLength}&isPopular={isPopular}";
             }
 
             return null;

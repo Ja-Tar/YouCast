@@ -9,7 +9,7 @@
         FontFamily="tahoma"
         FontSize="13"
         Title="{x:Static youCast:GeneralInformation.ApplicationName}" 
-        Height="303"
+        Height="310"
         Width="463"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen">
@@ -60,6 +60,12 @@
                                     Text="Unlimited: 0" />
                             </DockPanel>
                         </DockPanel>
+                        <StackPanel HorizontalAlignment="Left">
+                            <DockPanel Width="200">
+                                <Label DockPanel.Dock="Left" Content="Audio Language:"/>
+                                <ComboBox MinWidth="80" x:Name="LanguageBox" HorizontalContentAlignment="Stretch" />
+                            </DockPanel>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
