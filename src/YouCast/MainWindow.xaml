@@ -9,7 +9,7 @@
         FontFamily="tahoma"
         FontSize="13"
         Title="{x:Static youCast:GeneralInformation.ApplicationName}" 
-        Height="303"
+        Height="310"
         Width="463"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen">
@@ -60,6 +60,12 @@
                                     Text="Unlimited: 0" />
                             </DockPanel>
                         </DockPanel>
+                        <StackPanel HorizontalAlignment="Left">
+                            <DockPanel Width="200">
+                                <Label DockPanel.Dock="Left" Content="Audio Language:"/>
+                                <ComboBox MinWidth="80" x:Name="LanguageBox" HorizontalContentAlignment="Stretch" />
+                            </DockPanel>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
@@ -116,7 +122,8 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Name}" Uid="{Binding NameID}" Width="200"/>
-                                            <TextBlock Text="{Binding Size}" Width="200"/>
+                                            <TextBlock Text="{Binding Size}" Width="100"/>
+                                            <TextBlock Text="{Binding Language}" Width="100"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>

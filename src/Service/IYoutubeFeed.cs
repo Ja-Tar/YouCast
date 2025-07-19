@@ -12,35 +12,37 @@ namespace Service
     {
         [OperationContract]
         [WebGet(
-            UriTemplate = "GetUserFeed?userId={userId}&encoding={encoding}&maxLength={maxLength}&isPopular={isPopular}",
+            UriTemplate = "GetUserFeed?userId={userId}&encoding={encoding}&language={language}&maxLength={maxLength}&isPopular={isPopular}",
             BodyStyle = WebMessageBodyStyle.Bare)]
         Task<SyndicationFeedFormatter> GetUserFeedAsync(
             string userId,
             string encoding,
+            string language,
             int maxLength,
             bool isPopular);
 
         [OperationContract]
         [WebGet(
             UriTemplate =
-                "GetPlaylistFeed?playlistId={playlistId}&encoding={encoding}&maxLength={maxLength}&isPopular={isPopular}",
+                "GetPlaylistFeed?playlistId={playlistId}&encoding={encoding}&language={language}&maxLength={maxLength}&isPopular={isPopular}",
             BodyStyle = WebMessageBodyStyle.Bare)]
         Task<SyndicationFeedFormatter> GetPlaylistFeedAsync(
             string playlistId,
             string encoding,
+            string language,
             int maxLength,
             bool isPopular);
 
         [OperationContract]
-        [WebGet(UriTemplate = "Video.mp4?videoId={videoId}&encoding={encoding}")]
-        Task GetVideoAsync(string videoId, string encoding);
+        [WebGet(UriTemplate = "Video.mp4?videoId={videoId}&encoding={encoding}&language={language}")]
+        Task GetVideoAsync(string videoId, string encoding, string language);
 
         [OperationContract]
-        [WebGet(UriTemplate = "Audio.m4a?videoId={videoId}")]
-        Task GetAudioAsync(string videoId);
+        [WebGet(UriTemplate = "Audio.m4a?videoId={videoId}&language={language}")]
+        Task GetAudioAsync(string videoId, string language);
 
         [OperationContract]
-        [WebGet(UriTemplate = "File.mp4?videoId={videoId}&channelId={channelId}")]
-        Task<Stream> GetFile(string videoId, string channelId);
+        [WebGet(UriTemplate = "File.mp4?videoId={videoId}&channelId={channelId}&language={language}")]
+        Task<Stream> GetFile(string videoId, string channelId, string language);
     }
 }
