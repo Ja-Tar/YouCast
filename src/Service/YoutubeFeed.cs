@@ -173,8 +173,8 @@ namespace Service
 
                 EnsureChannelConfigFile(channelConfigFilePath, videoInfo, language);
 
-                var resolution = 
-                    int.TryParse(encoding.Remove(encoding.Length - 1).Substring(startIndex: 4), out int parsedResolution) ? 
+                var resolution =
+                    int.TryParse(encoding.Remove(encoding.Length - 1).Substring(startIndex: 4), out int parsedResolution) ?
                     parsedResolution : 720;
 
                 StreamManifest streamManifest;
