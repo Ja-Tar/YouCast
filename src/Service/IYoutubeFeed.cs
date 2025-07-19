@@ -41,8 +41,8 @@ namespace Service
         [WebGet(UriTemplate = "Audio.m4a?videoId={videoId}&language={language}")]
         Task GetAudioAsync(string videoId, string language);
 
-        [OperationContract] // TODO: Add a language parameter
-        [WebGet(UriTemplate = "File.mp4?videoId={videoId}&channelId={channelId}")]
-        Task<Stream> GetFile(string videoId, string channelId);
+        [OperationContract]
+        [WebGet(UriTemplate = "File.mp4?videoId={videoId}&channelId={channelId}&language={language}")]
+        Task<Stream> GetFile(string videoId, string channelId, string language);
     }
 }

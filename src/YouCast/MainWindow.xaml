@@ -122,7 +122,8 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Name}" Uid="{Binding NameID}" Width="200"/>
-                                            <TextBlock Text="{Binding Size}" Width="200"/>
+                                            <TextBlock Text="{Binding Size}" Width="100"/>
+                                            <TextBlock Text="{Binding Language}" Width="100"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>

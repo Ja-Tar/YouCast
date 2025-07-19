@@ -152,9 +152,21 @@ namespace Service
             async Task<string> GetVideoUriAsync()
             {
                 var videoInfo = await _youtubeClient.Videos.GetAsync(videoId);
+                Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
                 var fileName = $"{videoInfo.Id}.mp4";
                 var videoDirectory = "Videos";
-                var channelDirectory = Path.Combine(videoDirectory, videoInfo.Author.ChannelId);
+
+                // <ChannelID>_<Language> if other then Original
+                string channelDirectory;
+                if (language == YouTubeLang.Original)
+                {
+                    channelDirectory = Path.Combine(videoDirectory, videoInfo.Author.ChannelId);
+                }
+                else
+                {
+                    channelDirectory = Path.Combine(videoDirectory, $"{videoInfo.Author.ChannelId}_{language.ToString().ToLower()}");
+                }
+
                 var filePath = Path.Combine(channelDirectory, fileName);
                 var channelConfigFilePath = Path.Combine(channelDirectory, "config.xml");
 
@@ -167,16 +179,10 @@ namespace Service
                 {
                     Console.WriteLine(filePath);
 
-                    return GenerateFileUri(videoId, videoInfo.Author.ChannelId);
+                    return GenerateFileUri(videoId, videoInfo.Author.ChannelId, language);
                 }
 
-                if (!File.Exists(channelConfigFilePath))
-                {
-                    var xml = new XElement("FolderConfig",
-                        new XElement("ChannelId", videoInfo.Author.ChannelId),
-                        new XElement("ChannelName", videoInfo.Author.ChannelTitle));
-                    xml.Save(channelConfigFilePath);
-                }
+                EnsureChannelConfigFile(channelConfigFilePath, videoInfo, language);
 
                 var resolution = 720;
                 try
@@ -187,16 +193,13 @@ namespace Service
                 {
                 }
 
-
-                Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
-
                 StreamManifest streamManifest;
 
                 try
                 {
                     streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
                 }
-                catch (Exception ex)
+                catch (VideoUnplayableException ex)
                 {
                     Console.WriteLine($"Error fetching stream manifest for video {videoId}: {ex.Message}");
                     // TODO: more error info
@@ -225,7 +228,7 @@ namespace Service
 
                     Console.WriteLine($"Video saved to: {filePath}");
 
-                    return GenerateFileUri(videoId, videoInfo.Author.ChannelId);
+                    return GenerateFileUri(videoId, videoInfo.Author.ChannelId, language);
                 }
 
                 var muxedStreamInfo =
@@ -235,7 +238,40 @@ namespace Service
                 return muxedStreamInfo?.Url;
             }
 
-            string GenerateFileUri(string _videoId, string _channelId) => $"File.mp4?videoId={_videoId}&channelId={_channelId}";
+            string GenerateFileUri(string _videoId, string _channelId, YouTubeLang _language)
+            {
+                return $"File.mp4?videoId={_videoId}&channelId={_channelId}&language={_language}";
+            }
+        }
+
+        private static void EnsureChannelConfigFile(string channelConfigFilePath, YoutubeExplode.Videos.Video videoInfo, YouTubeLang language)
+        {
+            List<XElement> elements = new List<XElement> {
+                new XElement("ChannelId", videoInfo.Author.ChannelId),
+                new XElement("ChannelName", videoInfo.Author.ChannelTitle),
+                new XElement("ChannelLanguage", language)
+            };
+
+            if (File.Exists(channelConfigFilePath))
+            {
+                var existingXml = XElement.Load(channelConfigFilePath);
+                elements = elements
+                    .Where(e => existingXml.Element(e.Name) == null)
+                    .ToList();
+
+                // Add missing elements to the existing config and save
+                if (elements.Count > 0)
+                {
+                    foreach (var el in elements)
+                        existingXml.Add(el);
+                    existingXml.Save(channelConfigFilePath);
+                }
+            }
+            else
+            {
+                var xml = new XElement("FolderConfig", elements);
+                xml.Save(channelConfigFilePath);
+            }
         }
 
         public async Task GetAudioAsync(string videoId, string languageString)
@@ -327,12 +363,22 @@ namespace Service
             context.OutgoingResponse.RedirectTo(redirectUri);
         }
 
-        public Task<Stream> GetFile(string videoID, string channelID)
+        public Task<Stream> GetFile(string videoID, string channelID, string languageString)
         {
             var context = WebOperationContext.Current;
             var mainDirectory = "Videos";
-            var channelDirectory = Path.Combine(mainDirectory, channelID);
+            Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
 
+            string channelDirectory;
+            if (language != YouTubeLang.Original)
+            {
+                channelDirectory = Path.Combine(mainDirectory, $"{channelID}_{language.ToString().ToLower()}");
+            } 
+            else
+            {
+                channelDirectory = Path.Combine(mainDirectory, channelID);
+            }
+            
             if (!Directory.Exists(channelDirectory))
             {
                 context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;

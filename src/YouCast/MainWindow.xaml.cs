@@ -509,7 +509,7 @@ namespace YouCast
             UpdateFolderSize();
         }
 
-        public string GetChannelNameFromConfig(string channelId)
+        public string GetNameFromConfig(string channelId, string elementName, string defaultValue)
         {
             var videoDirectory = "Videos";
 
@@ -532,13 +532,13 @@ namespace YouCast
                         catch (IOException)
                         {
                             retryCount--;
-                            System.Threading.Thread.Sleep(1000); // Czekaj 1 sekund� przed ponown� pr�b�
+                            System.Threading.Thread.Sleep(1000);
                         }
                     }
 
                     if (doc != null)
                     {
-                        return doc.Root.Element("ChannelName").Value;
+                        return doc.Root.Element(elementName)?.Value ?? defaultValue;
                     }
                 }
             }
@@ -555,9 +555,10 @@ namespace YouCast
                 var folderSizes = directoryInfo.GetDirectories()
                     .Select(dir => new
                     {
-                        Name = GetChannelNameFromConfig(dir.Name),
+                        Name = GetNameFromConfig(dir.Name, "ChannelName", dir.Name),
                         NameID = dir.Name,
-                        Size = FormatSize(GetDirectorySize(dir))
+                        Size = FormatSize(GetDirectorySize(dir)),
+                        Language = GetNameFromConfig(dir.Name, "ChannelLanguage", YouTubeLang.Original.ToString())
                     })
                     .ToList();
 
