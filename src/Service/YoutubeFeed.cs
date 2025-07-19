@@ -211,7 +211,7 @@ namespace Service
                     catch (AudioStreamNotFoundException)
                     {
                         Console.WriteLine($"Audio stream for {languageString} not found, redirecting...");
-                        return $"Video.mp4?videoId={videoId}&channelId={videoInfo.Author.ChannelId}&language=Original";
+                        return $"Video.mp4?videoId={videoId}&channelId={videoInfo.Author.ChannelId}&language={YouTubeLang.Original.ToString()}";
                     }
 
                     var videoStreamInfos = streamManifest
