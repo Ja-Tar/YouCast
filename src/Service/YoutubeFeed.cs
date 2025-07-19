@@ -155,18 +155,7 @@ namespace Service
                 Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
                 var fileName = $"{videoInfo.Id}.mp4";
                 var videoDirectory = "Videos";
-
-                // <ChannelID>_<Language> if other then Original
-                string channelDirectory;
-                if (language == YouTubeLang.Original)
-                {
-                    channelDirectory = Path.Combine(videoDirectory, videoInfo.Author.ChannelId);
-                }
-                else
-                {
-                    channelDirectory = Path.Combine(videoDirectory, $"{videoInfo.Author.ChannelId}_{language.ToString().ToLower()}");
-                }
-
+                string channelDirectory = GetChannelDirectory(videoDirectory, videoInfo.Author.ChannelId, language);
                 var filePath = Path.Combine(channelDirectory, fileName);
                 var channelConfigFilePath = Path.Combine(channelDirectory, "config.xml");
 
@@ -368,17 +357,8 @@ namespace Service
             var context = WebOperationContext.Current;
             var mainDirectory = "Videos";
             Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
+            string channelDirectory = GetChannelDirectory(mainDirectory, channelID, language);
 
-            string channelDirectory;
-            if (language != YouTubeLang.Original)
-            {
-                channelDirectory = Path.Combine(mainDirectory, $"{channelID}_{language.ToString().ToLower()}");
-            } 
-            else
-            {
-                channelDirectory = Path.Combine(mainDirectory, channelID);
-            }
-            
             if (!Directory.Exists(channelDirectory))
             {
                 context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
@@ -427,6 +407,13 @@ namespace Service
 
             context.OutgoingResponse.ContentLength = fileInfo.Length;
             return Task.FromResult<Stream>(stream);
+        }
+
+        private static string GetChannelDirectory(string mainDirectory, string channelID, YouTubeLang language)
+        {
+            // <ChannelID>_<Language> if other then Original
+            return Path.Combine(mainDirectory, language != YouTubeLang.Original ?
+                $"{channelID}_{language.ToString().ToLower()}" : channelID);
         }
 
         public class PartialStream : Stream
