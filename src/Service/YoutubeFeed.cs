@@ -176,7 +176,10 @@ namespace Service
                 var resolution = 720;
                 try
                 {
-                    resolution = int.Parse(encoding.Remove(encoding.Length - 1).Substring(startIndex: 4));
+                    if (!string.IsNullOrEmpty(encoding))
+                    {
+                        resolution = int.Parse(encoding.Remove(encoding.Length - 1).Substring(startIndex: 4));
+                    }
                 }
                 catch
                 {
@@ -191,8 +194,7 @@ namespace Service
                 catch (VideoUnplayableException ex)
                 {
                     Console.WriteLine($"Error fetching stream manifest for video {videoId}: {ex.Message}");
-                    // TODO: more error info
-                    // TODO: popup or some kind of info in the UI
+                    // TODO: more error info and popup or some kind of info in the UI
                     return null;
                 }
                 var muxedStreamInfos = streamManifest.GetMuxedStreams().ToList();
@@ -201,7 +203,16 @@ namespace Service
                 {
                     Console.WriteLine("No muxed streams found for: " + videoId);
 
-                    AudioOnlyStreamInfo audioStreamInfo = GetAudioStreamsByLanguage(streamManifest, languageString);
+                    AudioOnlyStreamInfo audioStreamInfo;
+                    try
+                    {
+                        audioStreamInfo = GetAudioStreamsByLanguage(streamManifest, language);
+                    }
+                    catch (AudioStreamNotFoundException)
+                    {
+                        Console.WriteLine($"Audio stream for {languageString} not found, redirecting...");
+                        return $"Video.mp4?videoId={videoId}&channelId={videoInfo.Author.ChannelId}&language=Original";
+                    }
 
                     var videoStreamInfos = streamManifest
                         .GetVideoOnlyStreams()
@@ -270,16 +281,25 @@ namespace Service
             async Task<string> GetAudioUriAsync()
             {
                 var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(videoId);
-                AudioOnlyStreamInfo audios = GetAudioStreamsByLanguage(streamManifest, languageString);
+                Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
+
+                AudioOnlyStreamInfo audios;
+                try
+                {
+                    audios = GetAudioStreamsByLanguage(streamManifest, language);
+                }
+                catch (AudioStreamNotFoundException)
+                {
+                    Console.WriteLine($"Audio stream for {languageString} not found, redirecting...");
+                    return $"Audio.m4a?videoId={videoId}&language=Original";
+                }
 
                 return audios?.Url;
             }
         }
 
-        private static AudioOnlyStreamInfo GetAudioStreamsByLanguage(StreamManifest streamManifest, string languageString)
+        private static AudioOnlyStreamInfo GetAudioStreamsByLanguage(StreamManifest streamManifest, YouTubeLang language)
         {
-            Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
-
             // All streams
             var audioStreamList = streamManifest
                 .GetAudioOnlyStreams()
@@ -292,14 +312,13 @@ namespace Service
                 .Distinct()
                 .ToList();
 
-            if (HasAudioLanguage(audioLangList, language))
+            if (HasAudioLanguage(audioLangList, language) || language == YouTubeLang.Original)
             {
                 Console.WriteLine($"Using {language} audio");
             }
             else
             {
-                Console.WriteLine("Using Original audio");
-                language = YouTubeLang.Original;
+                throw new AudioStreamNotFoundException { Data = { { "Language", language } }  };
             }
 
             // Get highest bitrate audio stream with selected language
@@ -345,7 +364,7 @@ namespace Service
 
             if (redirectUri == null)
             {
-                context.OutgoingResponse.StatusCode = HttpStatusCode.NotFound;
+                context.OutgoingResponse.StatusCode = HttpStatusCode.InternalServerError;
                 return;
             }
 
