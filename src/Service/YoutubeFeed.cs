@@ -251,7 +251,7 @@ namespace Service
             }
         }
 
-        private AudioOnlyStreamInfo GetAudioStreamsByLanguage(StreamManifest streamManifest, string languageString)
+        private static AudioOnlyStreamInfo GetAudioStreamsByLanguage(StreamManifest streamManifest, string languageString)
         {
             Enum.TryParse(languageString ?? string.Empty, out YouTubeLang language);
 
@@ -267,7 +267,7 @@ namespace Service
                 .Distinct()
                 .ToList();
 
-            if (audioLangList?.Any(lang => lang?.Name.Contains(language.ToString()) == true) == true)
+            if (HasAudioLanguage(audioLangList, language))
             {
                 Console.WriteLine($"Using {language} audio");
             }
@@ -285,6 +285,11 @@ namespace Service
                 .FirstOrDefault();
 
             return audioStream;
+        }
+
+        private static bool HasAudioLanguage(List<YoutubeExplode.Videos.ClosedCaptions.Language?> audioLangList, YouTubeLang language)
+        {
+            return audioLangList?.Any(lang => lang?.Name.Contains(language.ToString()) == true) == true;
         }
 
         private async Task<SyndicationFeedFormatter> GetFeedFormatterAsync(Func<string, Task<ItunesFeed>> getFeedAsync)
