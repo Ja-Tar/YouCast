@@ -14,6 +14,7 @@ Added functionality:
 - caching of muxed video files
 - cache setting tab used for deleting cached files
 - HTTP range support for playing cached files
+- YT Dubbing feature support
 
 # Original README
 
