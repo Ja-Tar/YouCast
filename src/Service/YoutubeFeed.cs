@@ -318,7 +318,7 @@ namespace Service
             }
             else
             {
-                throw new AudioStreamNotFoundException { Data = { { "Language", language } }  };
+                throw new AudioStreamNotFoundException { Data = { { "Language", language } } };
             }
 
             // Get highest bitrate audio stream with selected language
