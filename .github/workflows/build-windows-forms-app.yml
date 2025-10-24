@@ -76,7 +76,7 @@ jobs:
 
     - if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.cpu != 'Any CPU' }}
       name: Artifacts Upload
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: art_${{ github.event.inputs.build }}_${{ github.event.inputs.cpu }}
         path: src/YouCast/bin/${{ github.event.inputs.cpu }}/${{ github.event.inputs.build }}/
@@ -84,7 +84,7 @@ jobs:
 
     - if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.cpu == 'Any CPU' }}
       name: Artifacts Upload Any CPU
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: art_${{ github.event.inputs.build }}_${{ github.event.inputs.cpu }}
         path: src/YouCast/bin/${{ github.event.inputs.build }}/ 
