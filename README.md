@@ -18,9 +18,9 @@ Added functionality:
 
 # Original README
 
-[![All Releases](https://img.shields.io/github/downloads/i3arnon/YouCast/total.svg)](https://github.com/i3arnon/YouCast/releases)
-[![Release](https://img.shields.io/github/release/i3arnon/YouCast.svg)](https://github.com/i3arnon/YouCast/releases)
-[![License](https://img.shields.io/github/license/i3arnon/YouCast.svg)](LICENSE)
+[![All Releases](https://img.shields.io/github/downloads/Ja-Tar/YouCast/total.svg)](https://github.com/Ja-Tar/YouCast/releases)
+[![Release](https://img.shields.io/github/release/Ja-Tar/YouCast.svg)](https://github.com/Ja-Tar/YouCast/releases)
+[![License](https://img.shields.io/github/license/Ja-Tar/YouCast.svg)](LICENSE)
 
 YouCast allows you to subscribe to channels and playlists on YouTube as video and audio podcasts in any standard podcast app (e.g. Overcast, iTunes, BeyondPod, etc.).
 
