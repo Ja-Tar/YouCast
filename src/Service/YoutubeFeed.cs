@@ -159,20 +159,6 @@ namespace Service
                 var filePath = Path.Combine(channelDirectory, fileName);
                 var channelConfigFilePath = Path.Combine(channelDirectory, "config.xml");
 
-                if (!Directory.Exists(channelDirectory))
-                {
-                    Directory.CreateDirectory(channelDirectory);
-                }
-
-                if (File.Exists(filePath))
-                {
-                    Console.WriteLine(filePath);
-
-                    return GenerateFileUri(videoId, videoInfo.Author.ChannelId, language);
-                }
-
-                EnsureChannelConfigFile(channelConfigFilePath, videoInfo, language);
-
                 var resolution =
                     int.TryParse(encoding.Remove(encoding.Length - 1).Substring(startIndex: 4), out int parsedResolution) ?
                     parsedResolution : 720;
@@ -194,6 +180,20 @@ namespace Service
                 if (muxedStreamInfos.Count == 0)
                 {
                     Console.WriteLine("No muxed streams found for: " + videoId);
+
+                    if (!Directory.Exists(channelDirectory))
+                    {
+                        Directory.CreateDirectory(channelDirectory);
+                    }
+
+                    if (File.Exists(filePath))
+                    {
+                        Console.WriteLine(filePath);
+
+                        return GenerateFileUri(videoId, videoInfo.Author.ChannelId, language);
+                    }
+
+                    EnsureChannelConfigFile(channelConfigFilePath, videoInfo, language);
 
                     AudioOnlyStreamInfo audioStreamInfo;
                     try
