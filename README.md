@@ -5,6 +5,9 @@ YouCast
 [![Release](https://img.shields.io/github/release/Ja-Tar/YouCast.svg)](https://github.com/Ja-Tar/YouCast/releases)
 [![License](https://img.shields.io/github/license/Ja-Tar/YouCast.svg)](LICENSE)
 
+> [!important] 
+> Mixed `360p` streams started to be available again! (I think that for them you don't need `ffmpeg`, but I didn't tested it)
+
 # Important Notice !!!
 
 **This is a fork of the original YouCast project by I3arnon**
@@ -64,4 +67,4 @@ Google restricts the amount of requests you can make per day with each API key. 
 
 1. Explicit/restricted videos can't be downloaded (they require YouCast to login with a user)
 2. Audio feed episodes on iOS are 2X in length (second half is silent)
-3. Muxed streams have stopped working (because of YouTube changes - [YoutubeExplode info](https://github.com/Tyrrrz/YoutubeExplode/releases/tag/6.4.2))
+3. Muxed streams have stopped working (because of YouTube changes - [YoutubeExplode info](https://github.com/Tyrrrz/YoutubeExplode/releases/tag/6.4.2), **UPDATE** - now they work again)
