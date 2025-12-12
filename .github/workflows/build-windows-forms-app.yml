@@ -42,7 +42,7 @@ jobs:
 
     - name: Restore NuGet packages from Cache
       id: cache-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           ~/.nuget/packages
@@ -51,7 +51,7 @@ jobs:
     
     - name: Restore build directories from Cache
       id: cache-restore-build
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           src/**/bin
@@ -120,7 +120,7 @@ jobs:
     
     - name: Cache NuGet packages
       id: cache-save
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           ~/.nuget/packages
@@ -128,7 +128,7 @@ jobs:
     
     - name: Cache build directories
       id: cache-save-build
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           src/**/bin
