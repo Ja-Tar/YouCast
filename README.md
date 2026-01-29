@@ -5,8 +5,8 @@ YouCast
 [![Release](https://img.shields.io/github/release/Ja-Tar/YouCast.svg)](https://github.com/Ja-Tar/YouCast/releases)
 [![License](https://img.shields.io/github/license/Ja-Tar/YouCast.svg)](LICENSE)
 
-> [!important] 
-> Mixed `360p` streams started to be available again! (I think that for them you don't need `ffmpeg`, but I didn't tested it)
+> [!CAUTION]
+> Downloading currently broken -> see https://github.com/Ja-Tar/YouCast/issues/38
 
 # Important Notice !!!
 
