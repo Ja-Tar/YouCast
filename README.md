@@ -63,7 +63,7 @@ Google restricts the amount of requests you can make per day with each API key. 
 4. Generate an API key for Youtube Data API v3.
 5. Add the Application name and API key in the YouCast program, then click on save.
 
-## Known Issues
+# Known Issues
 
 1. Explicit/restricted videos can't be downloaded (they require YouCast to login with a user)
 2. Audio feed episodes on iOS are 2X in length (second half is silent)
