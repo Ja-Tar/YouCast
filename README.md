@@ -14,7 +14,7 @@ YouCast
 
 This fork is work in progress. Fixes are not tested and may not work as expected.
 
-**Note:** This fork requires `ffmpeg` to be installed or `ffmpeg` binaries to be present in the same folder.
+**Note:** This fork requires `ffmpeg` to be installed or `ffmpeg` binaries to be present in the app folder.
 
 Added functionality:
 - local muxing of audio and video streams
