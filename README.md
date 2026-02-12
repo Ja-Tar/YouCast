@@ -5,8 +5,8 @@ YouCast
 [![Release](https://img.shields.io/github/release/Ja-Tar/YouCast.svg)](https://github.com/Ja-Tar/YouCast/releases)
 [![License](https://img.shields.io/github/license/Ja-Tar/YouCast.svg)](LICENSE)
 
-> [!CAUTION]
-> Downloading currently broken -> see https://github.com/Ja-Tar/YouCast/issues/38
+> [!NOTE]
+> Downloading is working again
 
 # Important Notice !!!
 
