@@ -111,7 +111,7 @@ jobs:
     
     - if: ${{ github.event_name != 'workflow_dispatch' }}
       name: Upload x64 Release Assets
-      uses: alexellis/upload-assets@0.4.1
+      uses: alexellis/upload-assets@0.5.0
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
