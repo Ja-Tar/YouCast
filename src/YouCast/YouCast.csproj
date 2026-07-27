@@ -124,10 +124,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\Settings.settings">
+    <EmbeddedResource Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
+    </EmbeddedResource>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

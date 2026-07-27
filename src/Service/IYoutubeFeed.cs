@@ -33,6 +33,11 @@ namespace Service
             int maxLength,
             bool isPopular);
 
+        //[OperationContract]
+        //[WebGet(
+        //    UriTemplate = "GetChannelFeed?channelId={channelId}&encoding={encoding}&maxLength={maxLength}&isPopular={isPopular}&liveCheck={liveCheck}&shortsCheck={shortsCheck}",
+        //    BodyStyle = WebMessageBodyStyle.Bare)]
+
         [OperationContract]
         [WebGet(UriTemplate = "Video.mp4?videoId={videoId}&encoding={encoding}&language={language}")]
         Task GetVideoAsync(string videoId, string encoding, string language);
