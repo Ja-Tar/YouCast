@@ -31,7 +31,7 @@ on:
           - 'x64'
           - 'Any CPU'
   release:
-    types: [created]
+    types: [published]
   
 jobs:
   build:
