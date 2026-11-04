@@ -6,7 +6,7 @@ YouCast
 [![License](https://img.shields.io/github/license/Ja-Tar/YouCast.svg)](LICENSE)
 
 > [!NOTE]
-> Downloading is working again
+> I am working on alternative with docker support and on newer .NET 10.
 
 # Important Notice !!!
 
