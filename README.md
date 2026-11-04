@@ -12,7 +12,8 @@ YouCast
 
 **This is a fork of the original YouCast project by I3arnon**
 
-This fork is work in progress. Fixes are not tested and may not work as expected.
+This fork is maintenance only. Fixes are not tested and may not work as expected.
+I am working on alternative with docker support.
 
 **Note:** This fork requires `ffmpeg` to be installed or `ffmpeg` binaries to be present in the app folder.
 
